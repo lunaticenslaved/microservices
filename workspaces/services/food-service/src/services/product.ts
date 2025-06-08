@@ -1,4 +1,4 @@
-import { PrismaTransaction } from '#/prisma';
+import { PrismaTransaction } from '../prisma';
 
 export async function checkIfNameUnique(
   arg: { name: string },

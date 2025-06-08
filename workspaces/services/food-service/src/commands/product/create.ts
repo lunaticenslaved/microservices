@@ -1,10 +1,11 @@
-import { Action } from '#/app';
 import { Errors } from '#/errors';
+import { App } from '#/app';
 import { Models } from '#/models';
-import { Service } from '#/services';
+import { Services } from '#/services';
+import { Command } from '@libs/types';
 import z from 'zod/v4';
 
-export type CreateRequest = Action.IRequest<{
+export type CreateRequest = Command.IRequest<{
   name: string;
   nutrients: {
     calories: number;
@@ -15,12 +16,12 @@ export type CreateRequest = Action.IRequest<{
   };
 }>;
 
-export type CreateResponse = Action.IResponse<Models.Product>;
+export type CreateResponse = Command.IResponse<Models.Product>;
 
 export type CreateErrors = ReturnType<typeof Errors.Product.createNameNotUniqueError>;
 
-export default Action.add<CreateRequest, CreateResponse>({
-  action: 'product/create',
+export default App.addCommand<CreateRequest, CreateResponse>({
+  command: 'product/create',
   validator: z.object({
     name: z.string().max(255).trim(),
     nutrients: z.object({
@@ -48,7 +49,7 @@ export default Action.add<CreateRequest, CreateResponse>({
   }),
   handler: async ({ data }, { prisma }) => {
     const created = await prisma.$transaction(async trx => {
-      const result = await Service.Product.checkIfNameUnique(data, trx);
+      const result = await Services.Product.checkIfNameUnique(data, trx);
 
       if (!result.unique) {
         throw Errors.Product.createNameNotUniqueError(data);
