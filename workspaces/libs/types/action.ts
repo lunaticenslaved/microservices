@@ -2,12 +2,14 @@ import z, { ZodIssue } from 'zod/v4';
 
 export namespace Action {
   export type IRequest<TData> = {
+    service: 'food';
     action: string;
     data: TData;
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export const RequestValidator: z.ZodType<IRequest<any>> = z.object({
+    service: z.literal('food'),
     action: z.string(),
     data: z.any(),
   });

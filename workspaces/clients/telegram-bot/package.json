@@ -1,5 +1,5 @@
 {
-  "name": "@services/telegram-bot",
+  "name": "@clients/telegram-bot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,6 +13,7 @@
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "yaml": "^2.8.0",
     "zod": "^3.25.56"
   },
   "devDependencies": {

@@ -18,5 +18,12 @@
   "[xml]": {
     "editor.defaultFormatter": "redhat.vscode-xml"
   },
-  "cSpell.words": ["Preprod", "swiper", "Unfavour", "Unpublish", "Yend"]
+  "cSpell.words": [
+    "Preprod",
+    "swiper",
+    "Unfavour",
+    "Unpublish",
+    "Yend"
+  ],
+  "nxConsole.generateAiAgentRules": true
 }
