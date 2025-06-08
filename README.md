@@ -1,0 +1,1 @@
+- `useNx` set to `true` to use auto loading env files

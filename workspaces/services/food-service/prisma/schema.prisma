@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Food_Product {
+    id   String @id @default(uuid()) @db.Uuid
+    name String @unique @db.VarChar(255)
+
+    nutrientsId String         @unique @db.Uuid
+    nutrients   Food_Nutrients @relation(fields: [nutrientsId], references: [id], onDelete: Restrict)
+
+    // productComplexes Food_ProductComplex_Bind[]
+}
+
+// model Food_Recipe {
+//     id          String @id @default(uuid()) @db.Uuid
+//     name        String @db.VarChar(255)
+//     description String @db.Text
+
+//     productComplexes Food_ProductComplex[]
+// }
+
+model Food_Nutrients {
+    id String @id @default(uuid()) @db.Uuid
+
+    calories Float @default(0) @db.Real
+    proteins Float @default(0) @db.Real
+    fats     Float @default(0) @db.Real
+    carbs    Float @default(0) @db.Real
+    fibers   Float @default(0) @db.Real
+
+    product Food_Product?
+}
+
+// model Food_ProductComplex {
+//     id String @id @default(uuid()) @db.Uuid
+
+//     recipe   Food_Recipe? @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+//     recipeId String?      @db.Uuid
+
+//     title       String  @db.Char(255)
+//     description String? @db.Char(1000)
+//     grams       Int     @db.Integer
+
+//     productBinds        Food_ProductComplex_Bind[] @relation("Food_ProductComplex_Bind_parent")
+//     productBindsAsChild Food_ProductComplex_Bind[] @relation("Food_ProductComplex_Bind_child")
+
+//     createdAt DateTime @default(now())
+// }
+
+// model Food_ProductComplex_Bind {
+//     id String @id @default(uuid()) @db.Uuid
+
+//     parent   Food_ProductComplex @relation("Food_ProductComplex_Bind_parent", fields: [parentId], references: [id], onDelete: Cascade)
+//     parentId String              @db.Uuid
+
+//     productComplex   Food_ProductComplex? @relation("Food_ProductComplex_Bind_child", fields: [productComplexId], references: [id], onDelete: Cascade)
+//     productComplexId String?              @db.Uuid
+
+//     product   Food_Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
+//     productId String?       @db.Uuid
+
+//     grams Int @db.Integer
+
+//     @@unique([parentId, productComplexId, productId])
+// }
