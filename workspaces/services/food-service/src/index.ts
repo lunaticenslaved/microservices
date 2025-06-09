@@ -6,7 +6,7 @@ import path from 'path';
 // import cors from 'cors';
 import { App } from './app';
 import { prisma } from './prisma';
-import { recursiveImport } from './utils/common';
+import { recursiveImport } from './utils';
 import { Command } from '@libs/types';
 
 // const CORS_ORIGIN_WHITELIST: string[] = [];

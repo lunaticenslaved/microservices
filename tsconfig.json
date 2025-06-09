@@ -42,5 +42,5 @@
     /* Language features */
     "experimentalDecorators": true,
   },
-  "exclude": ["node_modules", "**/__tests__/*.ts"]
+  "exclude": ["node_modules"]
 }

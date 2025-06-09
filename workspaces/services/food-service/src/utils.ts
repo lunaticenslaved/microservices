@@ -23,7 +23,7 @@ export async function recursiveImport(dir: string) {
         paths.push(`${item}/${i}`);
       });
     } else {
-      await import(currentPath);
+      await import(currentPath).catch(() => null);
     }
   }
 }

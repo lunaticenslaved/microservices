@@ -4,14 +4,14 @@ import express from 'express';
 import axios, { AxiosError } from 'axios';
 import YAML from 'yaml';
 
-import { Action } from '@libs/types';
+import { Command } from '@libs/types';
 
 const PORT = Number(process.env.PORT__TELEGRAM_BOT);
 
 const app = express();
 
 const Endpoints = {
-  food: 'http://localhost:4002/act',
+  food: 'http://localhost:4002',
 };
 
 app.use(express.json());
@@ -23,11 +23,11 @@ app.post('/message', async (req, res) => {
   const actionRequest = YAML.parse(message);
   console.log('[TELEGRAM BOT] Received message:', message, actionRequest);
 
-  const validatedBody = Action.RequestValidator.safeParse(actionRequest);
+  const validatedBody = Command.RequestValidator.safeParse(actionRequest);
 
   if (!validatedBody.success) {
-    const result: Action.CommonError.RequestValidation =
-      Action.Error.createRequestValidationError({
+    const result: Command.CommonError.RequestValidation =
+      Command.Error.createRequestValidationError({
         issues: validatedBody.error.issues,
       });
 
@@ -52,16 +52,16 @@ app.listen(PORT, () => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function act(service: Action.IRequest<any>['service']) {
+function act(service: Command.IRequest<any>['service']) {
   return async <
-    TReq extends Action.IRequest<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
-    TRes extends Action.IResponse<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
-    TError extends Action.IError<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    TReq extends Command.IRequest<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    TRes extends Command.IResponse<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    TError extends Command.IError<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
   >(
     req: TReq,
-  ): Promise<TRes | TError | Action.CommonError.Any> => {
+  ): Promise<TRes | TError | Command.CommonError.Any> => {
     try {
-      const response = await axios.post<TRes>(Endpoints[service], req, {
+      const response = await axios.post<TRes>(`${Endpoints[service]}/command`, req, {
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
         },
@@ -80,7 +80,7 @@ function act(service: Action.IRequest<any>['service']) {
           details: obj['details'] ?? null,
         } as TError;
       } else {
-        const unknownError = Action.Error.createUnknownError();
+        const unknownError = Command.Error.createUnknownError();
 
         return unknownError as TError;
       }

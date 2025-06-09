@@ -2,11 +2,11 @@
   "name": "@services/food-service",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "dev": "nodemon src/index.ts",
     "typecheck": "tsc --project tsconfig.json --noEmit",
-    "test": "jest"
+    "test": "jest --config ./jest.config.ts"
   },
   "author": "",
   "license": "ISC",
