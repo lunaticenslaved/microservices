@@ -20,8 +20,7 @@ export type CreateResponse = Command.IResponse<Models.Product>;
 
 export type CreateErrors = ReturnType<typeof Errors.Product.createNameNotUniqueError>;
 
-export default App.addCommand<CreateRequest, CreateResponse>({
-  command: 'product/create',
+export default App.addCommand<CreateRequest, CreateResponse>('product/create', {
   validator: z.object({
     name: z.string().max(255).trim(),
     nutrients: z.object({
@@ -55,7 +54,7 @@ export default App.addCommand<CreateRequest, CreateResponse>({
         throw Errors.Product.createNameNotUniqueError(data);
       }
 
-      return await trx.food_Product.create({
+      const { id } = await trx.food_Product.create({
         data: {
           name: data.name,
           nutrients: {
@@ -63,18 +62,11 @@ export default App.addCommand<CreateRequest, CreateResponse>({
           },
         },
         select: {
-          name: true,
-          nutrients: {
-            select: {
-              calories: true,
-              proteins: true,
-              fats: true,
-              carbs: true,
-              fibers: true,
-            },
-          },
+          id: true,
         },
       });
+
+      return await Services.Product.get({ id }, { trx });
     });
 
     return {

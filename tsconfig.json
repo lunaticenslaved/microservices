@@ -1,13 +1,4 @@
 {
-  "ts-node": {
-    "require": ["tsconfig-paths/register"],
-    "files": true
-  },
-  "tsc-alias": {
-    "verbose": false,
-    "resolveFullPaths": true
-  },
-
   "compilerOptions": {
     "module": "CommonJS",
     "types": ["node", "jest", "express"],
@@ -41,6 +32,5 @@
 
     /* Language features */
     "experimentalDecorators": true,
-  },
-  "exclude": ["node_modules"]
+  }
 }

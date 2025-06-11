@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit",
     "test": "jest --config ./jest.config.ts"
   },
   "author": "",

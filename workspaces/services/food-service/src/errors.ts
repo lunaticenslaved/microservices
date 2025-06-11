@@ -9,4 +9,13 @@ export namespace Errors.Product {
       details: null,
     });
   }
+
+  export function createProductNotFoundError(arg: { id: string }) {
+    return new Command.Error({
+      type: 'product/not-found',
+      status: 404,
+      message: `Product with id '${arg.id}' not found`,
+      details: null,
+    });
+  }
 }
