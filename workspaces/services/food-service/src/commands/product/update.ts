@@ -20,16 +20,13 @@ App.addCommand<
         return Domain.Food.createProductNotFoundException({ id: data.id });
       }
 
-      // FIXME update name
+      if (data.name) {
+        await Components.Product.update({ id: product.id, name: data.name }, { trx });
+      }
 
       await Components.Nutrients.update(
-        {
-          id: product.nutrientsId,
-          ...data.nutrients,
-        },
-        {
-          trx,
-        },
+        { id: product.nutrientsId, ...data.nutrients },
+        { trx },
       );
 
       const updated = await Components.Product.findFirst_DTO({ id: data.id }, { trx });

@@ -8,7 +8,7 @@ import { Gateway } from '@libs/gateway';
 const COMMANDS: Record<string, any> = {};
 
 type CommandOptions<
-  TReq extends Gateway.IRequest<unknown>,
+  TReq extends Gateway.IRequest<string, unknown>,
   TRes extends Gateway.IResponse<unknown>,
   TErr extends Gateway.IException<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
 > = {
@@ -20,10 +20,10 @@ export class App {
   static express: Express = express();
 
   static addCommand<
-    TReq extends Gateway.IRequest<unknown>,
+    TReq extends Gateway.IRequest<string, unknown>,
     TRes extends Gateway.IResponse<unknown>,
     TErr extends Gateway.IException<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
-  >(command: string, arg: CommandOptions<TReq, TRes, TErr>) {
+  >(command: TReq['command'], arg: CommandOptions<TReq, TRes, TErr>) {
     COMMANDS[command] = {
       ...arg,
       command,
