@@ -1,8 +1,8 @@
-import createAction, { CreateRequest } from '../create';
+import createAction from '../create';
 
 describe('validator is valid', () => {
   test('name is trimmed', () => {
-    const data: CreateRequest['data'] = {
+    const parsed = createAction.validator.safeParse({
       name: ' name ',
       nutrients: {
         calories: 0,
@@ -11,9 +11,7 @@ describe('validator is valid', () => {
         carbs: 0,
         fibers: 0,
       },
-    };
-
-    const parsed = createAction.validator.safeParse(data);
+    });
 
     expect(parsed.success).toBeTruthy();
 

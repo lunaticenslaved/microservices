@@ -1,78 +1,54 @@
-import { Errors } from '#/errors';
 import { App } from '#/app';
-import { Models } from '#/models';
 import { Services } from '#/services';
-import { Command } from '@libs/types';
 import z from 'zod/v4';
+import { Gateway } from '@libs/gateway';
 
-export type CreateRequest = Command.IRequest<{
-  name: string;
-  nutrients: {
-    calories: number;
-    proteins: number;
-    fats: number;
-    carbs: number;
-    fibers: number;
-  };
-}>;
-
-export type CreateResponse = Command.IResponse<Models.Product>;
-
-export type CreateErrors = ReturnType<typeof Errors.Product.createNameNotUniqueError>;
-
-export default App.addCommand<CreateRequest, CreateResponse>('product/create', {
+export default App.addCommand<
+  Gateway.Food.Product.CreateRequest,
+  Gateway.Food.Product.CreateResponse,
+  Gateway.Food.Product.CreateErrors
+>('product/create', {
   validator: z.object({
-    name: z.string().max(255).trim(),
-    nutrients: z.object({
-      calories: z.coerce
-        .number()
-        .gte(0)
-        .transform(val => Math.min(val, 0)),
-      proteins: z.coerce
-        .number()
-        .gte(0)
-        .transform(val => Math.min(val, 0)),
-      fats: z.coerce
-        .number()
-        .gte(0)
-        .transform(val => Math.min(val, 0)),
-      carbs: z.coerce
-        .number()
-        .gte(0)
-        .transform(val => Math.min(val, 0)),
-      fibers: z.coerce
-        .number()
-        .gte(0)
-        .transform(val => Math.min(val, 0)),
-    }),
+    name: Services.Product.CreateSchema.shape.name,
+    nutrients: Services.Nutrients.CreateSchema,
   }),
   handler: async ({ data }, { prisma }) => {
-    const created = await prisma.$transaction(async trx => {
-      const result = await Services.Product.checkIfNameUnique(data, trx);
-
-      if (!result.unique) {
-        throw Errors.Product.createNameNotUniqueError(data);
-      }
-
-      const { id } = await trx.food_Product.create({
-        data: {
-          name: data.name,
-          nutrients: {
-            create: data.nutrients,
-          },
-        },
-        select: {
-          id: true,
-        },
+    return prisma.$transaction(async trx => {
+      const nutrientsResult = await Services.Nutrients.create(data.nutrients, {
+        trx,
       });
 
-      return await Services.Product.get({ id }, { trx });
-    });
+      if (!nutrientsResult.success) {
+        return nutrientsResult.error;
+      }
 
-    return {
-      success: true,
-      status: 401,
-      data: created,
-    };
+      const createResult = await Services.Product.create(
+        {
+          name: data.name,
+          nutrientsId: nutrientsResult.data.id,
+        },
+        {
+          trx,
+        },
+      );
+
+      if (!createResult.success) {
+        return createResult.error;
+      }
+
+      const productId = createResult.data.id;
+      const created = await Services.Product.findFirst_DTO({ id: productId }, { trx });
+
+      if (!created) {
+        // Cannot be here
+        throw new Error('Product not found!');
+      }
+
+      return {
+        success: true,
+        status: 201,
+        data: created,
+      };
+    });
   },
 });

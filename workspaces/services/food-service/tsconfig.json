@@ -9,13 +9,11 @@
   },
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "baseUrl": ".",
     "paths": {
       "#/*": ["src/*"]
     }
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": ["src"]
 }

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@libs/gateway": "^1.0.0",
     "@libs/types": "^1.0.0",
     "@prisma/client": "^6.8.2",
     "dotenv": "^16.5.0",

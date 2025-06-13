@@ -1,13 +1,14 @@
 import 'dotenv/config';
 
 import express, { Express } from 'express';
-import path from 'path';
 
 // import cors from 'cors';
 import { App } from './app';
 import { prisma } from './prisma';
-import { recursiveImport } from './utils';
-import { Command } from '@libs/types';
+
+import fs from 'fs';
+import path from 'path';
+import { Gateway } from '@libs/gateway';
 
 // const CORS_ORIGIN_WHITELIST: string[] = [];
 const PORT = Number(process.env.PORT__FOOD_SERVICE);
@@ -44,14 +45,14 @@ export async function configureApp(app: Express) {
       const actionType = req.body?.action;
       const action = App.findCommand(actionType);
       if (!action) {
-        throw Command.Error.createUnknownActionError({
+        throw Gateway.createUnknownActionException({
           action: actionType,
         });
       }
 
       const validationResult = action.validator.safeParse(req.body);
       if (validationResult.error) {
-        throw Command.Error.createRequestValidationError({
+        throw Gateway.createRequestValidationException({
           issues: validationResult.error.issues,
         });
       }
@@ -64,10 +65,10 @@ export async function configureApp(app: Express) {
 
       res.status(actionResponse.status).send(actionResponse).json().end();
     } catch (error) {
-      if (error instanceof Command.Error) {
+      if (error instanceof Gateway.Exception) {
         res.status(error.status).send(error).json().end();
       } else {
-        const unknownError = Command.Error.createUnknownError();
+        const unknownError = Gateway.createUnknownException();
 
         if (error instanceof Error) {
           unknownError.message = error.message;
@@ -83,6 +84,29 @@ export async function configureApp(app: Express) {
   app.listen(PORT, () => {
     console.log(`Food service is up and running on port ${PORT}!`);
   });
+}
+
+async function recursiveImport(dir: string) {
+  const paths = fs.readdirSync(dir);
+
+  while (paths.length) {
+    const item = paths.pop();
+
+    if (!item) {
+      continue;
+    }
+
+    const currentPath = path.resolve(dir, item);
+    const stat = fs.lstatSync(currentPath);
+
+    if (stat.isDirectory()) {
+      fs.readdirSync(currentPath).forEach(i => {
+        paths.push(`${item}/${i}`);
+      });
+    } else {
+      await import(currentPath).catch(() => null);
+    }
+  }
 }
 
 configureApp(express());

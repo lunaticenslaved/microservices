@@ -1,28 +1,15 @@
 import { App } from '#/app';
-import { Errors } from '#/errors';
-import { Command } from '@libs/types';
-import { Models } from '#/models';
 import { Services } from '#/services';
 import z from 'zod/v4';
+import { Domain, Gateway } from '@libs/gateway';
 
-export type UpdateRequest = Command.IRequest<{
-  id: string;
-  name?: {
-    set: string;
-  };
-  nutrients: Pick<
-    Services.Nutrients.UpdateRequest,
-    'calories' | 'carbs' | 'fats' | 'fibers' | 'proteins'
-  >;
-}>;
-
-export type UpdateResponse = Command.IResponse<Models.Product>;
-
-export type UpdateErrors = ReturnType<typeof Errors.Product.createProductNotFoundError>;
-
-App.addCommand<UpdateRequest, UpdateResponse>('product/update', {
+App.addCommand<
+  Gateway.Food.Product.UpdateRequest,
+  Gateway.Food.Product.UpdateResponse,
+  Gateway.Food.Product.UpdateErrors
+>('product/update', {
   handler: async ({ data }, { prisma }) => {
-    const updated = await prisma.$transaction(async trx => {
+    return await prisma.$transaction(async trx => {
       const product = await trx.food_Product.findFirst({
         where: {
           id: data.id,
@@ -30,8 +17,10 @@ App.addCommand<UpdateRequest, UpdateResponse>('product/update', {
       });
 
       if (!product) {
-        throw Errors.Product.createProductNotFoundError({ id: data.id });
+        return Domain.Food.ProductException.createProductNotFound({ id: data.id });
       }
+
+      // FIXME update name
 
       await Services.Nutrients.update(
         {
@@ -43,28 +32,23 @@ App.addCommand<UpdateRequest, UpdateResponse>('product/update', {
         },
       );
 
-      return Services.Product.get({ id: data.id }, { trx });
-    });
+      const updated = await Services.Product.findFirst_DTO({ id: data.id }, { trx });
 
-    return {
-      success: true,
-      status: 200,
-      data: updated,
-    };
+      if (!updated) {
+        // Cannot be here
+        throw new Error('Product not found!');
+      }
+
+      return {
+        success: true,
+        status: 200,
+        data: updated,
+      };
+    });
   },
   validator: z.object({
-    id: z.uuid(),
-    name: z
-      .object({
-        set: z.string(),
-      })
-      .optional(),
-    nutrients: Services.Nutrients.UpdateSchema.pick({
-      calories: true,
-      carbs: true,
-      fats: true,
-      fibers: true,
-      proteins: true,
-    }),
+    id: Services.Product.UpdateSchema.shape.id,
+    name: Services.Product.UpdateSchema.shape.name,
+    nutrients: Services.Nutrients.UpdateSchema,
   }),
 });
