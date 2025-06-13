@@ -47,5 +47,6 @@ export class App {
 export namespace App {
   export interface ICommandContext {
     prisma: typeof prisma;
+    userId: string;
   }
 }

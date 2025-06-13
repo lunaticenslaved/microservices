@@ -10,25 +10,28 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Food_Product {
-    id   String @id @default(uuid()) @db.Uuid
-    name String @unique @db.VarChar(255)
+model Product {
+    id     String @id @default(uuid()) @db.Uuid
+    name   String @db.VarChar(255)
+    userId String @db.Uuid
 
-    nutrientsId String         @unique @db.Uuid
-    nutrients   Food_Nutrients @relation(fields: [nutrientsId], references: [id], onDelete: Restrict)
+    nutrientsId String    @unique @db.Uuid
+    nutrients   Nutrients @relation(fields: [nutrientsId], references: [id], onDelete: Restrict)
 
-    // productComplexes Food_ProductComplex_Bind[]
+    // productComplexes ProductComplex_Bind[]
+
+    @@unique([userId, name])
 }
 
-// model Food_Recipe {
+// model Recipe {
 //     id          String @id @default(uuid()) @db.Uuid
 //     name        String @db.VarChar(255)
 //     description String @db.Text
 
-//     productComplexes Food_ProductComplex[]
+//     productComplexes ProductComplex[]
 // }
 
-model Food_Nutrients {
+model Nutrients {
     id String @id @default(uuid()) @db.Uuid
 
     calories Float @default(0) @db.Real
@@ -37,35 +40,35 @@ model Food_Nutrients {
     carbs    Float @default(0) @db.Real
     fibers   Float @default(0) @db.Real
 
-    product Food_Product?
+    product Product?
 }
 
-// model Food_ProductComplex {
+// model ProductComplex {
 //     id String @id @default(uuid()) @db.Uuid
 
-//     recipe   Food_Recipe? @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+//     recipe   Recipe? @relation(fields: [recipeId], references: [id], onDelete: SetNull)
 //     recipeId String?      @db.Uuid
 
 //     title       String  @db.Char(255)
 //     description String? @db.Char(1000)
 //     grams       Int     @db.Integer
 
-//     productBinds        Food_ProductComplex_Bind[] @relation("Food_ProductComplex_Bind_parent")
-//     productBindsAsChild Food_ProductComplex_Bind[] @relation("Food_ProductComplex_Bind_child")
+//     productBinds        ProductComplex_Bind[] @relation("ProductComplex_Bind_parent")
+//     productBindsAsChild ProductComplex_Bind[] @relation("ProductComplex_Bind_child")
 
 //     createdAt DateTime @default(now())
 // }
 
-// model Food_ProductComplex_Bind {
+// model ProductComplex_Bind {
 //     id String @id @default(uuid()) @db.Uuid
 
-//     parent   Food_ProductComplex @relation("Food_ProductComplex_Bind_parent", fields: [parentId], references: [id], onDelete: Cascade)
+//     parent   ProductComplex @relation("ProductComplex_Bind_parent", fields: [parentId], references: [id], onDelete: Cascade)
 //     parentId String              @db.Uuid
 
-//     productComplex   Food_ProductComplex? @relation("Food_ProductComplex_Bind_child", fields: [productComplexId], references: [id], onDelete: Cascade)
+//     productComplex   ProductComplex? @relation("ProductComplex_Bind_child", fields: [productComplexId], references: [id], onDelete: Cascade)
 //     productComplexId String?              @db.Uuid
 
-//     product   Food_Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
+//     product   Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
 //     productId String?       @db.Uuid
 
 //     grams Int @db.Integer

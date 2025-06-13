@@ -1,3 +1,5 @@
+// TODO move it somewhere
+
 export const Result = {
   success: <T>(data: T): ResultSuccess<T> => {
     return {

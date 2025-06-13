@@ -8,7 +8,7 @@ async function checkIfNameUnique(
   arg: { name: string },
   context: { trx: PrismaTransaction },
 ): Promise<{ unique: boolean }> {
-  const found = await context.trx.food_Product.findFirst({
+  const found = await context.trx.product.findFirst({
     where: {
       name: arg.name,
     },
@@ -29,7 +29,7 @@ export async function findFirst_DTO(
   arg: FindFirstRequest,
   context: { trx: PrismaTransaction },
 ): Promise<Domain.Food.Product | null> {
-  return await context.trx.food_Product.findFirst({
+  return await context.trx.product.findFirst({
     where: {
       id: arg.id,
     },
@@ -52,6 +52,7 @@ export async function findFirst_DTO(
 // CREATE PRODUCT ----------------------------------------------------------------------
 export type CreateRequest = z.infer<typeof CreateSchema>;
 export const CreateSchema = z.object({
+  userId: Schemas.Product.shape.userId,
   nutrientsId: Schemas.Product.shape.nutrientsId,
   name: ServiceUtils.stringUpdate.schema(Schemas.Product.shape.name),
 });
@@ -67,8 +68,9 @@ export async function create(
     return Result.error(Domain.Food.createProductNameNotUniqueException({ name }));
   }
 
-  const created = await context.trx.food_Product.create({
+  const created = await context.trx.product.create({
     data: {
+      userId: arg.userId,
       nutrientsId: arg.nutrientsId,
       name: ServiceUtils.stringCreate.prisma(arg.name),
     },
@@ -111,7 +113,7 @@ export async function update(
   }
 
   // Update product
-  await context.trx.food_Product.update({
+  await context.trx.product.update({
     where: {
       id: arg.id,
     },

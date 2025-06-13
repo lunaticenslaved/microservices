@@ -9,9 +9,10 @@ import { prisma } from './prisma';
 import fs from 'fs';
 import path from 'path';
 import { Gateway } from '@libs/gateway';
+import { randomUUID } from 'crypto';
 
 // const CORS_ORIGIN_WHITELIST: string[] = [];
-const PORT = Number(process.env.PORT__FOOD_SERVICE);
+const PORT = Number(process.env.PORT);
 
 export async function configureApp(app: Express) {
   console.log('Importing actions... Start');
@@ -59,6 +60,7 @@ export async function configureApp(app: Express) {
 
       const requestContext: App.ICommandContext = {
         prisma: prisma,
+        userId: randomUUID(), // TODO not random uuid
       };
 
       const actionResponse = await action.handler(validationResult.data, requestContext);

@@ -5,11 +5,7 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-export const prisma =
-  globalThis.prisma ||
-  new PrismaClient({
-    datasourceUrl: process.env.DATABASE_URL__FOOD_SERVICE,
-  });
+export const prisma = globalThis.prisma || new PrismaClient();
 
 globalThis.prisma = prisma;
 

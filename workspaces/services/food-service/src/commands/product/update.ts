@@ -10,7 +10,7 @@ App.addCommand<
 >('product/update', {
   handler: async ({ data }, { prisma }) => {
     return await prisma.$transaction(async trx => {
-      const product = await trx.food_Product.findFirst({
+      const product = await trx.product.findFirst({
         where: {
           id: data.id,
         },

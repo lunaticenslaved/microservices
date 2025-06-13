@@ -1,6 +1,8 @@
 import z from 'zod/v4';
 import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from './gateway/common';
 
+// TODO move it somewhere
+
 export const ServiceUtils = {
   numberCreate: {
     schema: (value: z.ZodNumber): z.ZodType<NumberCreate> => {

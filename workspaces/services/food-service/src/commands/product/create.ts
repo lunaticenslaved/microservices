@@ -12,7 +12,7 @@ export default App.addCommand<
     name: Components.Product.CreateSchema.shape.name,
     nutrients: Components.Nutrients.CreateSchema,
   }),
-  handler: async ({ data }, { prisma }) => {
+  handler: async ({ data }, { prisma, userId }) => {
     return prisma.$transaction(async trx => {
       const nutrientsResult = await Components.Nutrients.create(data.nutrients, {
         trx,
@@ -24,6 +24,7 @@ export default App.addCommand<
 
       const createResult = await Components.Product.create(
         {
+          userId,
           name: data.name,
           nutrientsId: nutrientsResult.data.id,
         },

@@ -30,7 +30,7 @@ export async function create(
     };
   }
 
-  const { id } = await context.trx.food_Nutrients.create({
+  const { id } = await context.trx.nutrients.create({
     data: {
       calories: parsed.data?.calories
         ? ServiceUtils.numberCreate.prisma(parsed.data.calories)
@@ -86,7 +86,7 @@ export async function update(
     };
   }
 
-  await context.trx.food_Nutrients.update({
+  await context.trx.nutrients.update({
     where: {
       id: data.id,
     },
