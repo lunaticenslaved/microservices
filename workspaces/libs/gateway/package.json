@@ -1,9 +1,11 @@
 {
-  "name": "@libs/types",
+  "name": "@libs/gateway",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
-  "scripts": {},
+  "scripts": {
+    "typecheck": "tsc --project ./tsconfig.json --noEmit"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {

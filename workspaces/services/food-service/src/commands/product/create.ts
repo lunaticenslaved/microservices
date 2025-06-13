@@ -1,5 +1,5 @@
 import { App } from '#/app';
-import { Services } from '#/services';
+import { Components } from '#/components';
 import z from 'zod/v4';
 import { Gateway } from '@libs/gateway';
 
@@ -9,12 +9,12 @@ export default App.addCommand<
   Gateway.Food.Product.CreateErrors
 >('product/create', {
   validator: z.object({
-    name: Services.Product.CreateSchema.shape.name,
-    nutrients: Services.Nutrients.CreateSchema,
+    name: Components.Product.CreateSchema.shape.name,
+    nutrients: Components.Nutrients.CreateSchema,
   }),
   handler: async ({ data }, { prisma }) => {
     return prisma.$transaction(async trx => {
-      const nutrientsResult = await Services.Nutrients.create(data.nutrients, {
+      const nutrientsResult = await Components.Nutrients.create(data.nutrients, {
         trx,
       });
 
@@ -22,7 +22,7 @@ export default App.addCommand<
         return nutrientsResult.error;
       }
 
-      const createResult = await Services.Product.create(
+      const createResult = await Components.Product.create(
         {
           name: data.name,
           nutrientsId: nutrientsResult.data.id,
@@ -37,7 +37,7 @@ export default App.addCommand<
       }
 
       const productId = createResult.data.id;
-      const created = await Services.Product.findFirst_DTO({ id: productId }, { trx });
+      const created = await Components.Product.findFirst_DTO({ id: productId }, { trx });
 
       if (!created) {
         // Cannot be here

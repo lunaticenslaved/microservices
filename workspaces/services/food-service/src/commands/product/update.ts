@@ -1,5 +1,5 @@
 import { App } from '#/app';
-import { Services } from '#/services';
+import { Components } from '#/components';
 import z from 'zod/v4';
 import { Domain, Gateway } from '@libs/gateway';
 
@@ -22,7 +22,7 @@ App.addCommand<
 
       // FIXME update name
 
-      await Services.Nutrients.update(
+      await Components.Nutrients.update(
         {
           id: product.nutrientsId,
           ...data.nutrients,
@@ -32,7 +32,7 @@ App.addCommand<
         },
       );
 
-      const updated = await Services.Product.findFirst_DTO({ id: data.id }, { trx });
+      const updated = await Components.Product.findFirst_DTO({ id: data.id }, { trx });
 
       if (!updated) {
         // Cannot be here
@@ -47,8 +47,8 @@ App.addCommand<
     });
   },
   validator: z.object({
-    id: Services.Product.UpdateSchema.shape.id,
-    name: Services.Product.UpdateSchema.shape.name,
-    nutrients: Services.Nutrients.UpdateSchema,
+    id: Components.Product.UpdateSchema.shape.id,
+    name: Components.Product.UpdateSchema.shape.name,
+    nutrients: Components.Nutrients.UpdateSchema,
   }),
 });
