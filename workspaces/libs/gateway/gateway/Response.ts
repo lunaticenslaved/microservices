@@ -3,3 +3,12 @@ export type IResponse<TData> = {
   data: TData;
   status: number;
 };
+
+export function createResponse<TData>(
+  arg: Pick<IResponse<TData>, 'data' | 'status'>,
+): IResponse<TData> {
+  return {
+    success: true,
+    ...arg,
+  };
+}

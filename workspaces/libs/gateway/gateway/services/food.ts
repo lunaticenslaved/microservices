@@ -4,11 +4,16 @@ import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from '../commo
 import { Domain } from '../../domain';
 
 export namespace Product {
+  export type DTO = {
+    id: string;
+    name: string;
+  };
+
   // CREATE --------------------------------------------------------------------------------
   export type CreateErrors =
     | Domain.Food.ProductNameNotUniqueException
     | Gateway.CommonExceptions;
-  export type CreateResponse = Gateway.IResponse<Domain.Food.Product>;
+  export type CreateResponse = Gateway.IResponse<DTO>;
   export type CreateRequest = Gateway.IRequest<
     'product/create',
     {
@@ -28,7 +33,7 @@ export namespace Product {
     | Domain.Food.ProductNotFoundException
     | Domain.Food.ProductNameNotUniqueException
     | Gateway.CommonExceptions;
-  export type UpdateResponse = Gateway.IResponse<Domain.Food.Product>;
+  export type UpdateResponse = Gateway.IResponse<DTO>;
   export type UpdateRequest = Gateway.IRequest<
     'product/update',
     {
@@ -53,7 +58,7 @@ export namespace Product {
 
   // GET -----------------------------------------------------------------------------------
   export type GetErrors = Domain.Food.ProductNotFoundException | Gateway.CommonExceptions;
-  export type GetResponse = Gateway.IResponse<Domain.Food.Product>;
+  export type GetResponse = Gateway.IResponse<DTO>;
   export type GetRequest = Gateway.IRequest<
     'product/get',
     { id: string } | { name: string }
@@ -62,5 +67,5 @@ export namespace Product {
   // LIST ----------------------------------------------------------------------------------
   export type ListErrors = Gateway.CommonExceptions;
   export type ListRequest = Gateway.IRequest<'product/list', void>;
-  export type ListResponse = Gateway.IResponse<{ items: Domain.Food.Product[] }>;
+  export type ListResponse = Gateway.IResponse<{ items: DTO[] }>;
 }

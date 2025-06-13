@@ -38,18 +38,20 @@ export default App.addCommand<
       }
 
       const productId = createResult.data.id;
-      const created = await Components.Product.findFirst_DTO({ id: productId }, { trx });
+      const created = await Components.Product.findFirst_DTO(
+        { id: productId, userId },
+        { trx },
+      );
 
       if (!created) {
         // Cannot be here
         throw new Error('Product not found!');
       }
 
-      return {
-        success: true,
+      return Gateway.createResponse({
         status: 201,
         data: created,
-      };
+      });
     });
   },
 });

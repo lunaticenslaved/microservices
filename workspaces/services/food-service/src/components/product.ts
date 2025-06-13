@@ -24,8 +24,22 @@ async function checkIfNameUnique(
 
 // FIND FIRST PRODUCT --------------------------------------------------------------------------
 export type FindFirstRequest = z.infer<typeof FindFirstSchema>;
-export const FindFirstSchema = Schemas.Product.pick({ id: true });
+export const FindFirstSchema = Schemas.Product.pick({ id: true, userId: true });
 export async function findFirst_DTO(
+  arg: FindFirstRequest,
+  context: { trx: PrismaTransaction },
+): Promise<Gateway.Food.Product.DTO | null> {
+  return await context.trx.product.findFirst({
+    where: {
+      id: arg.id,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+}
+export async function findFirst(
   arg: FindFirstRequest,
   context: { trx: PrismaTransaction },
 ): Promise<Domain.Food.Product | null> {
@@ -36,15 +50,8 @@ export async function findFirst_DTO(
     select: {
       id: true,
       name: true,
-      nutrients: {
-        select: {
-          calories: true,
-          proteins: true,
-          fats: true,
-          carbs: true,
-          fibers: true,
-        },
-      },
+      nutrientsId: true,
+      userId: true,
     },
   });
 }

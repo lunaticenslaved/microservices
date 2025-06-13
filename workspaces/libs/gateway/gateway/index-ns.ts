@@ -2,7 +2,7 @@ import { ZodIssue } from 'zod/v4';
 
 export { type IException, Exception, createException } from './Exception';
 export { type IRequest, RequestSchema } from './Request';
-export { type IResponse } from './Response';
+export { type IResponse, createResponse } from './Response';
 
 export * as Food from './services/food';
 

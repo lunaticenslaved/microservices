@@ -4,6 +4,8 @@ import { Gateway } from '../gateway';
 export type Product = {
   id: string;
   name: string;
+  nutrientsId: string;
+  userId: string;
 };
 
 export type ProductNameNotUniqueException =
