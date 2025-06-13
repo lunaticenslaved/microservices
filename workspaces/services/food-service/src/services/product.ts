@@ -58,13 +58,13 @@ export const CreateSchema = z.object({
 export async function create(
   arg: CreateRequest,
   context: { trx: PrismaTransaction },
-): Promise<Result<{ id: string }, Domain.Food.ProductException.NameNotUnique>> {
+): Promise<Result<{ id: string }, Domain.Food.ProductNameNotUniqueException>> {
   const name = arg.name.value;
 
   const { unique } = await checkIfNameUnique({ name }, context);
 
   if (!unique) {
-    return Result.error(Domain.Food.ProductException.createNameNotUnique({ name }));
+    return Result.error(Domain.Food.createProductNameNotUniqueException({ name }));
   }
 
   const created = await context.trx.food_Product.create({
@@ -92,7 +92,7 @@ export async function update(
 ): Promise<
   Result<
     null,
-    Domain.Food.ProductException.NameNotUnique | Gateway.RequestValidationException
+    Domain.Food.ProductNameNotUniqueException | Gateway.RequestValidationException
   >
 > {
   const parsed = z.safeParse(UpdateSchema, arg);
@@ -107,7 +107,7 @@ export async function update(
   const name = arg.name.value;
   const { unique } = await checkIfNameUnique({ name }, context);
   if (!unique) {
-    return Result.error(Domain.Food.ProductException.createNameNotUnique({ name }));
+    return Result.error(Domain.Food.createProductNameNotUniqueException({ name }));
   }
 
   // Update product

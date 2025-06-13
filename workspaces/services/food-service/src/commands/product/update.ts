@@ -17,7 +17,7 @@ App.addCommand<
       });
 
       if (!product) {
-        return Domain.Food.ProductException.createProductNotFound({ id: data.id });
+        return Domain.Food.createProductNotFoundException({ id: data.id });
       }
 
       // FIXME update name
