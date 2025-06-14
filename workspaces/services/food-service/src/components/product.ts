@@ -1,7 +1,6 @@
 import z from 'zod/v4';
 import { PrismaTransaction } from '../prisma';
 import { ServiceUtils, Domain, Result, Gateway, ResultSuccess } from '@libs/gateway';
-import { Schemas } from '#/schemas';
 
 // CHECK IF NAME UNIQUE -----------------------------------------------------------------
 async function checkIfNameUnique(
@@ -25,8 +24,8 @@ async function checkIfNameUnique(
 // FIND FIRST PRODUCT -------------------------------------------------------------------
 export type FindFirstRequest = z.infer<typeof FindFirstSchema>;
 export const FindFirstSchema = z.union([
-  Schemas.Product.pick({ id: true, userId: true }),
-  Schemas.Product.pick({ name: true, userId: true }),
+  Domain.Food.ProductSchema.pick({ id: true, userId: true }),
+  Domain.Food.ProductSchema.pick({ name: true, userId: true }),
 ]);
 export async function findFirst_DTO(
   arg: FindFirstRequest,
@@ -87,7 +86,7 @@ export async function findFirst(
 
 // FIND MANY PRODUCTS
 export type FindManyRequest = z.infer<typeof FindManySchema>;
-export const FindManySchema = Schemas.Product.pick({ userId: true });
+export const FindManySchema = Domain.Food.ProductSchema.pick({ userId: true });
 export async function findMany_DTO(
   arg: FindManyRequest,
   context: { trx: PrismaTransaction },
@@ -110,9 +109,9 @@ export async function findMany_DTO(
 // CREATE PRODUCT ----------------------------------------------------------------------
 export type CreateRequest = z.infer<typeof CreateSchema>;
 export const CreateSchema = z.object({
-  userId: Schemas.Product.shape.userId,
-  nutrientsId: Schemas.Product.shape.nutrientsId,
-  name: ServiceUtils.stringUpdate.schema(Schemas.Product.shape.name),
+  userId: Domain.Food.ProductSchema.shape.userId,
+  nutrientsId: Domain.Food.ProductSchema.shape.nutrientsId,
+  name: ServiceUtils.stringUpdate.schema(Domain.Food.ProductSchema.shape.name),
 });
 export async function create(
   arg: CreateRequest,
@@ -143,8 +142,8 @@ export async function create(
 // UPDATE PRODUCT ----------------------------------------------------------------------
 export type UpdateRequest = z.infer<typeof UpdateSchema>;
 export const UpdateSchema = z.object({
-  id: Schemas.Product.shape.id,
-  name: ServiceUtils.stringUpdate.schema(Schemas.Product.shape.name),
+  id: Domain.Food.ProductSchema.shape.id,
+  name: ServiceUtils.stringUpdate.schema(Domain.Food.ProductSchema.shape.name),
 });
 export async function update(
   arg: UpdateRequest,
@@ -186,8 +185,8 @@ export async function update(
 // DELETE PRODUCT ----------------------------------------------------------------------
 export type DeleteOneRequest = z.infer<typeof DeleteOneSchema>;
 export const DeleteOneSchema = z.object({
-  id: Schemas.Product.shape.id,
-  userId: Schemas.Product.shape.userId,
+  id: Domain.Food.ProductSchema.shape.id,
+  userId: Domain.Food.ProductSchema.shape.userId,
 });
 export async function deleteOne(
   arg: DeleteOneRequest,
@@ -205,8 +204,8 @@ export async function deleteOne(
 // DELETE MANY PRODUCTS ----------------------------------------------------------------------
 export type DeleteManyRequest = z.infer<typeof DeleteManySchema>;
 export const DeleteManySchema = z.object({
-  ids: z.array(Schemas.Product.shape.id),
-  userId: Schemas.Product.shape.userId,
+  ids: z.array(Domain.Food.ProductSchema.shape.id),
+  userId: Domain.Food.ProductSchema.shape.userId,
 });
 export async function deleteMany(
   arg: DeleteManyRequest,
