@@ -6,10 +6,10 @@ import { Domain, Gateway } from '@libs/gateway';
 App.addCommand<
   Gateway.Food.Product.UpdateRequest,
   Gateway.Food.Product.UpdateResponse,
-  Gateway.Food.Product.UpdateErrors
+  Gateway.Food.Product.UpdateExceptions
 >('product/update', {
   handler: async ({ data }, { prisma, userId }) => {
-    return await prisma.$transaction(async trx => {
+    return await prisma.$noThrowTransaction(async trx => {
       const product = await Components.Product.findFirst(
         { id: data.id, userId },
         { trx },

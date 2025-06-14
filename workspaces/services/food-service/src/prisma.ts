@@ -1,15 +1,31 @@
-import { PrismaClient } from '@prisma/client';
+import { Gateway } from '@libs/gateway';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 declare global {
   // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined;
+  var prisma: typeof prismaExtended;
 }
 
-export const prisma = globalThis.prisma || new PrismaClient();
+const _prisma = new PrismaClient();
+const prismaExtended = _prisma.$extends({
+  client: {
+    $noThrowTransaction<T>(
+      callback: (client: Prisma.TransactionClient) => Promise<T>,
+    ): Promise<T> {
+      return _prisma.$transaction(async trx => {
+        const innerResult = await callback(trx);
 
-globalThis.prisma = prisma;
+        if (innerResult instanceof Gateway.Exception) {
+          await trx.$executeRaw`ROLLBACK`;
+        }
 
-export type PrismaTransaction = Omit<
-  PrismaClient,
-  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
->;
+        return innerResult;
+      });
+    },
+  },
+});
+
+globalThis.prisma = prismaExtended;
+
+export { prismaExtended as prisma };
+export type PrismaTransaction = Prisma.TransactionClient;

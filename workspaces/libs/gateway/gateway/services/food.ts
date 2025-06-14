@@ -10,7 +10,7 @@ export namespace Product {
   };
 
   // CREATE --------------------------------------------------------------------------------
-  export type CreateErrors =
+  export type CreateExceptions =
     | Domain.Food.ProductNameNotUniqueException
     | Gateway.CommonExceptions;
   export type CreateResponse = Gateway.IResponse<DTO>;
@@ -29,7 +29,7 @@ export namespace Product {
   >;
 
   // UPDATE --------------------------------------------------------------------------------
-  export type UpdateErrors =
+  export type UpdateExceptions =
     | Domain.Food.ProductNotFoundException
     | Domain.Food.ProductNameNotUniqueException
     | Gateway.CommonExceptions;
@@ -50,22 +50,21 @@ export namespace Product {
   >;
 
   // DELETE --------------------------------------------------------------------------------
-  export type DeleteErrors =
+  export type DeleteExceptions =
     | Domain.Food.ProductNotFoundException
     | Gateway.CommonExceptions;
   export type DeleteResponse = Gateway.IResponse<void>;
   export type DeleteRequest = Gateway.IRequest<'product/delete', { id: string }>;
 
   // GET -----------------------------------------------------------------------------------
-  export type GetErrors = Domain.Food.ProductNotFoundException | Gateway.CommonExceptions;
+  export type GetExceptions =
+    | Domain.Food.ProductNotFoundException
+    | Gateway.CommonExceptions;
   export type GetResponse = Gateway.IResponse<DTO>;
-  export type GetRequest = Gateway.IRequest<
-    'product/get',
-    { id: string } | { name: string }
-  >;
+  export type GetRequest = Gateway.IRequest<'product/get', { id: string }>;
 
   // LIST ----------------------------------------------------------------------------------
-  export type ListErrors = Gateway.CommonExceptions;
-  export type ListRequest = Gateway.IRequest<'product/list', void>;
+  export type ListExceptions = Gateway.CommonExceptions;
+  export type ListRequest = Gateway.IRequest<'product/list', unknown>;
   export type ListResponse = Gateway.IResponse<{ items: DTO[] }>;
 }

@@ -1,6 +1,6 @@
 import z from 'zod/v4';
 import { PrismaTransaction } from '../prisma';
-import { ServiceUtils, Domain, Result, Gateway } from '@libs/gateway';
+import { ServiceUtils, Domain, Result, Gateway, ResultSuccess } from '@libs/gateway';
 import { Schemas } from '#/schemas';
 
 // CHECK IF NAME UNIQUE -----------------------------------------------------------------
@@ -22,20 +22,36 @@ async function checkIfNameUnique(
   };
 }
 
-// FIND FIRST PRODUCT --------------------------------------------------------------------------
+// FIND FIRST PRODUCT -------------------------------------------------------------------
 export type FindFirstRequest = z.infer<typeof FindFirstSchema>;
-export const FindFirstSchema = Schemas.Product.pick({ id: true, userId: true });
+export const FindFirstSchema = z.union([
+  Schemas.Product.pick({ id: true, userId: true }),
+  Schemas.Product.pick({ name: true, userId: true }),
+]);
 export async function findFirst_DTO(
   arg: FindFirstRequest,
   context: { trx: PrismaTransaction },
 ): Promise<Gateway.Food.Product.DTO | null> {
+  const select = {
+    id: true,
+    name: true,
+  };
+
+  if ('id' in arg) {
+    return await context.trx.product.findFirst({
+      select,
+      where: {
+        id: arg.id,
+        userId: arg.userId,
+      },
+    });
+  }
+
   return await context.trx.product.findFirst({
+    select,
     where: {
-      id: arg.id,
-    },
-    select: {
-      id: true,
-      name: true,
+      name: arg.name,
+      userId: arg.userId,
     },
   });
 }
@@ -43,17 +59,52 @@ export async function findFirst(
   arg: FindFirstRequest,
   context: { trx: PrismaTransaction },
 ): Promise<Domain.Food.Product | null> {
+  const select = {
+    id: true,
+    name: true,
+    nutrientsId: true,
+    userId: true,
+  };
+
+  if ('id' in arg) {
+    return await context.trx.product.findFirst({
+      select,
+      where: {
+        id: arg.id,
+        userId: arg.userId,
+      },
+    });
+  }
+
   return await context.trx.product.findFirst({
+    select,
     where: {
-      id: arg.id,
-    },
-    select: {
-      id: true,
-      name: true,
-      nutrientsId: true,
-      userId: true,
+      name: arg.name,
+      userId: arg.userId,
     },
   });
+}
+
+// FIND MANY PRODUCTS
+export type FindManyRequest = z.infer<typeof FindManySchema>;
+export const FindManySchema = Schemas.Product.pick({ userId: true });
+export async function findMany_DTO(
+  arg: FindManyRequest,
+  context: { trx: PrismaTransaction },
+): Promise<ResultSuccess<Gateway.Food.Product.DTO[]>> {
+  const select = {
+    id: true,
+    name: true,
+  };
+
+  const items = await context.trx.product.findMany({
+    select,
+    where: {
+      userId: arg.userId,
+    },
+  });
+
+  return Result.success(items);
 }
 
 // CREATE PRODUCT ----------------------------------------------------------------------
@@ -130,4 +181,43 @@ export async function update(
   });
 
   return Result.success(null);
+}
+
+// DELETE PRODUCT ----------------------------------------------------------------------
+export type DeleteOneRequest = z.infer<typeof DeleteOneSchema>;
+export const DeleteOneSchema = z.object({
+  id: Schemas.Product.shape.id,
+  userId: Schemas.Product.shape.userId,
+});
+export async function deleteOne(
+  arg: DeleteOneRequest,
+  context: { trx: PrismaTransaction },
+): Promise<Result<void, Domain.Food.ProductNotFoundException>> {
+  const found = await findFirst(arg, context);
+
+  if (!found) {
+    return Result.error(Domain.Food.createProductNotFoundException(arg));
+  }
+
+  return Result.success(undefined);
+}
+
+// DELETE MANY PRODUCTS ----------------------------------------------------------------------
+export type DeleteManyRequest = z.infer<typeof DeleteManySchema>;
+export const DeleteManySchema = z.object({
+  ids: z.array(Schemas.Product.shape.id),
+  userId: Schemas.Product.shape.userId,
+});
+export async function deleteMany(
+  arg: DeleteManyRequest,
+  context: { trx: PrismaTransaction },
+): Promise<ResultSuccess<{ count: number }>> {
+  const { count } = await context.trx.product.deleteMany({
+    where: {
+      id: { in: arg.ids },
+      userId: arg.userId,
+    },
+  });
+
+  return Result.success({ count });
 }

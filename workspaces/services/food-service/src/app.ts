@@ -22,7 +22,7 @@ export class App {
   static addCommand<
     TReq extends Gateway.IRequest<string, unknown>,
     TRes extends Gateway.IResponse<unknown>,
-    TErr extends Gateway.IException<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    TErr extends Gateway.Exception<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
   >(command: TReq['command'], arg: CommandOptions<TReq, TRes, TErr>) {
     COMMANDS[command] = {
       ...arg,

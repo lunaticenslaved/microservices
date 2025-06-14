@@ -6,14 +6,14 @@ import { Gateway } from '@libs/gateway';
 export default App.addCommand<
   Gateway.Food.Product.CreateRequest,
   Gateway.Food.Product.CreateResponse,
-  Gateway.Food.Product.CreateErrors
+  Gateway.Food.Product.CreateExceptions
 >('product/create', {
   validator: z.object({
     name: Components.Product.CreateSchema.shape.name,
     nutrients: Components.Nutrients.CreateSchema,
   }),
   handler: async ({ data }, { prisma, userId }) => {
-    return prisma.$transaction(async trx => {
+    return prisma.$noThrowTransaction(async trx => {
       const nutrientsResult = await Components.Nutrients.create(data.nutrients, {
         trx,
       });

@@ -13,14 +13,15 @@ datasource db {
 model Product {
     id     String @id @default(uuid()) @db.Uuid
     name   String @db.VarChar(255)
-    userId String @db.Uuid
+    userId String @map("user_id") @db.Uuid
 
-    nutrientsId String    @unique @db.Uuid
+    nutrientsId String    @unique @map("nutrients_id") @db.Uuid
     nutrients   Nutrients @relation(fields: [nutrientsId], references: [id], onDelete: Restrict)
 
     // productComplexes ProductComplex_Bind[]
 
     @@unique([userId, name])
+    @@map("products")
 }
 
 // model Recipe {
