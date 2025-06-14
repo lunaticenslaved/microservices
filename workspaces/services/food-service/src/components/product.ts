@@ -2,6 +2,20 @@ import z from 'zod/v4';
 import { PrismaTransaction } from '../prisma';
 import { ServiceUtils, Domain, Result, Gateway, ResultSuccess } from '@libs/gateway';
 
+const DTO_SELECT = {
+  id: true,
+  name: true,
+  nutrients: {
+    select: {
+      calories: true,
+      proteins: true,
+      carbs: true,
+      fats: true,
+      fibers: true,
+    },
+  },
+};
+
 // CHECK IF NAME UNIQUE -----------------------------------------------------------------
 async function checkIfNameUnique(
   arg: { name: string },
@@ -37,14 +51,9 @@ export async function findFirst_DTO(
   arg: FindFirstRequest,
   context: { trx: PrismaTransaction },
 ): Promise<Gateway.Food.Product.DTO | null> {
-  const select = {
-    id: true,
-    name: true,
-  };
-
   if ('id' in arg) {
     return await context.trx.product.findFirst({
-      select,
+      select: DTO_SELECT,
       where: {
         id: arg.id,
         userId: arg.userId,
@@ -53,7 +62,7 @@ export async function findFirst_DTO(
   }
 
   return await context.trx.product.findFirst({
-    select,
+    select: DTO_SELECT,
     where: {
       name: arg.name,
       userId: arg.userId,
@@ -99,13 +108,8 @@ export async function findMany_DTO(
   arg: FindManyRequest,
   context: { trx: PrismaTransaction },
 ): Promise<ResultSuccess<Gateway.Food.Product.DTO[]>> {
-  const select = {
-    id: true,
-    name: true,
-  };
-
   const items = await context.trx.product.findMany({
-    select,
+    select: DTO_SELECT,
     where: {
       userId: arg.userId,
     },

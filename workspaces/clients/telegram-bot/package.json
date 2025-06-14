@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "typecheck": "tsc --project ./tsconfig.json --noEmit",
     "dev": "nodemon src/index.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@libs/types": "^1.0.0",
+    "@libs/gateway": "^1.0.0",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

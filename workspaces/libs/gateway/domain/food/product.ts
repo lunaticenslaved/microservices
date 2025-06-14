@@ -4,6 +4,7 @@ import { Gateway } from '../../gateway';
 // PRODUCT -----------------------------------------------------------------------------
 export type Product = {
   id: string;
+  /** Name */
   name: string;
   nutrientsId: string;
   userId: string;

@@ -3,8 +3,7 @@ import 'dotenv/config';
 import express from 'express';
 import axios, { AxiosError } from 'axios';
 import YAML from 'yaml';
-
-import { Command } from '@libs/types';
+import { Gateway } from '@libs/gateway';
 
 const PORT = Number(process.env.PORT__TELEGRAM_BOT);
 
@@ -23,11 +22,11 @@ app.post('/message', async (req, res) => {
   const actionRequest = YAML.parse(message);
   console.log('[TELEGRAM BOT] Received message:', message, actionRequest);
 
-  const validatedBody = Command.RequestValidator.safeParse(actionRequest);
+  const validatedBody = Gateway.RequestSchema.safeParse(actionRequest);
 
   if (!validatedBody.success) {
-    const result: Command.CommonError.RequestValidation =
-      Command.Error.createRequestValidationError({
+    const result: Gateway.RequestValidationException =
+      Gateway.createRequestValidationException({
         issues: validatedBody.error.issues,
       });
 
@@ -35,7 +34,7 @@ app.post('/message', async (req, res) => {
 
     res.status(result.status).send(result).json().end();
   } else {
-    const result = await act(validatedBody.data.service)(validatedBody.data);
+    const result = await command(validatedBody.data.service)(validatedBody.data);
 
     if (!result.success) {
       console.error('[TELEGRAM BOT] [ACT ERROR]', JSON.stringify(result, null, 2));
@@ -52,14 +51,14 @@ app.listen(PORT, () => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function act(service: Command.IRequest<any>['service']) {
+function command(service: Gateway.IRequest<any, any>['service']) {
   return async <
-    TReq extends Command.IRequest<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
-    TRes extends Command.IResponse<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
-    TError extends Command.IError<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    TReq extends Gateway.IRequest<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    TRes extends Gateway.IResponse<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    TError extends Gateway.Exception<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
   >(
     req: TReq,
-  ): Promise<TRes | TError | Command.CommonError.Any> => {
+  ): Promise<TRes | TError | Gateway.CommonExceptions> => {
     try {
       const response = await axios.post<TRes>(`${Endpoints[service]}/command`, req, {
         headers: {
@@ -80,7 +79,7 @@ function act(service: Command.IRequest<any>['service']) {
           details: obj['details'] ?? null,
         } as TError;
       } else {
-        const unknownError = Command.Error.createUnknownError();
+        const unknownError = Gateway.createUnknownException();
 
         return unknownError as TError;
       }

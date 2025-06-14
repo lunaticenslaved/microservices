@@ -5,8 +5,12 @@ import { Domain } from '../../domain';
 
 export namespace Product {
   export type DTO = {
-    id: string;
-    name: string;
+    id: Domain.Food.Product['id'];
+    name: Domain.Food.Product['name'];
+    nutrients: Pick<
+      Domain.Food.Nutrients,
+      'calories' | 'carbs' | 'fats' | 'fibers' | 'proteins'
+    >;
   };
 
   // CREATE --------------------------------------------------------------------------------
