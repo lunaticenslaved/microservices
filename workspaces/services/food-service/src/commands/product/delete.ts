@@ -2,7 +2,6 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Domain, Gateway } from '@libs/gateway';
-import { nonReachable } from '#/utils';
 
 export default App.addCommand<
   Gateway.Food.Product.DeleteRequest,
@@ -14,20 +13,33 @@ export default App.addCommand<
   }),
   handler: async ({ data }, { prisma, userId }) => {
     return prisma.$noThrowTransaction(async trx => {
-      const deleteResult = await Components.Product.deleteMany(
-        { ids: [data.id], userId },
+      const found = await Components.Product.findFirst(
+        {
+          id: data.id,
+          userId,
+        },
+        { trx },
+      );
+
+      if (!found) {
+        return Domain.Food.createProductNotFoundException({ id: data.id });
+      }
+
+      const deleteResult = await Components.Product.deleteOne(
+        { id: found.id, userId },
         { trx },
       );
 
       if (!deleteResult.success) {
-        nonReachable(deleteResult.success);
+        return deleteResult.error;
       }
 
-      if (deleteResult.data.count === 0) {
-        return Domain.Food.createProductNotFoundException(data);
-      }
+      await Components.Nutrients.deleteMany({ ids: [found.nutrientsId] }, { trx });
 
-      return Gateway.createResponse({ status: 200, data: undefined });
+      return Gateway.createResponse({
+        status: 200,
+        data: undefined,
+      });
     });
   },
 });

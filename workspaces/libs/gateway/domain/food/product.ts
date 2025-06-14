@@ -1,5 +1,5 @@
 import z from 'zod/v4';
-import { Gateway } from '../gateway';
+import { Gateway } from '../../gateway';
 
 // PRODUCT -----------------------------------------------------------------------------
 export type Product = {
@@ -9,12 +9,12 @@ export type Product = {
   userId: string;
 };
 
-export const ProductSchema: z.ZodType<Product> = z.object({
+export const ProductSchema = z.object({
   id: z.uuid(),
   name: z.string().min(1, 'At least one letter in name should be').trim(),
   nutrientsId: z.uuid(),
   userId: z.uuid(),
-});
+}) satisfies z.ZodType<Product>;
 
 export type ProductNameNotUniqueException =
   Gateway.IException<'food/product/name-not-unique'>;

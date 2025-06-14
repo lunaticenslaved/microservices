@@ -1,18 +1,26 @@
 import { z } from 'zod/v4';
 import { PrismaTransaction } from '../prisma';
-import { ServiceUtils, Gateway, Result } from '@libs/gateway';
-
-// TODO move validation to domain
+import { ServiceUtils, Gateway, Result, Domain, ResultSuccess } from '@libs/gateway';
 
 // CREATE NUTRIENTS ------------------------------------------------------------------------
 export type CreateRequest = z.infer<typeof CreateSchema>;
 export const CreateSchema = z
   .object({
-    calories: ServiceUtils.numberCreate.schema(z.number().gte(0)).optional(),
-    proteins: ServiceUtils.numberCreate.schema(z.number().gte(0)).optional(),
-    fats: ServiceUtils.numberCreate.schema(z.number().gte(0)).optional(),
-    carbs: ServiceUtils.numberCreate.schema(z.number().gte(0)).optional(),
-    fibers: ServiceUtils.numberCreate.schema(z.number().gte(0)).optional(),
+    calories: ServiceUtils.numberCreate
+      .schema(Domain.Food.NutrientsSchema.shape.calories)
+      .optional(),
+    proteins: ServiceUtils.numberCreate
+      .schema(Domain.Food.NutrientsSchema.shape.proteins)
+      .optional(),
+    fats: ServiceUtils.numberCreate
+      .schema(Domain.Food.NutrientsSchema.shape.fats)
+      .optional(),
+    carbs: ServiceUtils.numberCreate
+      .schema(Domain.Food.NutrientsSchema.shape.carbs)
+      .optional(),
+    fibers: ServiceUtils.numberCreate
+      .schema(Domain.Food.NutrientsSchema.shape.fibers)
+      .optional(),
   })
   .optional();
 export async function create(
@@ -61,15 +69,25 @@ export async function create(
   };
 }
 
-// UPDATE NUTRIENTS ---------------------------------------------------------------------------------
+// UPDATE NUTRIENTS ------------------------------------------------------------------------
 export type UpdateRequest = z.infer<typeof UpdateSchema>;
 export const UpdateSchema = z.object({
   id: z.uuid(),
-  calories: ServiceUtils.numberUpdate.schema(z.number().gte(0)).optional(),
-  proteins: ServiceUtils.numberUpdate.schema(z.number().gte(0)).optional(),
-  fats: ServiceUtils.numberUpdate.schema(z.number().gte(0)).optional(),
-  carbs: ServiceUtils.numberUpdate.schema(z.number().gte(0)).optional(),
-  fibers: ServiceUtils.numberUpdate.schema(z.number().gte(0)).optional(),
+  calories: ServiceUtils.numberUpdate
+    .schema(Domain.Food.NutrientsSchema.shape.calories)
+    .optional(),
+  proteins: ServiceUtils.numberUpdate
+    .schema(Domain.Food.NutrientsSchema.shape.proteins)
+    .optional(),
+  fats: ServiceUtils.numberUpdate
+    .schema(Domain.Food.NutrientsSchema.shape.fats)
+    .optional(),
+  carbs: ServiceUtils.numberUpdate
+    .schema(Domain.Food.NutrientsSchema.shape.carbs)
+    .optional(),
+  fibers: ServiceUtils.numberUpdate
+    .schema(Domain.Food.NutrientsSchema.shape.fibers)
+    .optional(),
 });
 export async function update(
   data: UpdateRequest,
@@ -107,4 +125,24 @@ export async function update(
     success: true,
     data: undefined,
   };
+}
+
+// DELETE MANY -----------------------------------------------------------------------------
+export type DeleteManyRequest = z.infer<typeof DeleteManySchema>;
+export const DeleteManySchema = z.object({
+  ids: z.array(Domain.Food.NutrientsSchema.shape.id),
+});
+export async function deleteMany(
+  arg: DeleteManyRequest,
+  context: { trx: PrismaTransaction },
+): Promise<ResultSuccess<{ count: number }>> {
+  const { count } = await context.trx.nutrients.deleteMany({
+    where: {
+      id: {
+        in: arg.ids,
+      },
+    },
+  });
+
+  return Result.success({ count });
 }

@@ -24,8 +24,14 @@ async function checkIfNameUnique(
 // FIND FIRST PRODUCT -------------------------------------------------------------------
 export type FindFirstRequest = z.infer<typeof FindFirstSchema>;
 export const FindFirstSchema = z.union([
-  Domain.Food.ProductSchema.pick({ id: true, userId: true }),
-  Domain.Food.ProductSchema.pick({ name: true, userId: true }),
+  z.object({
+    id: Domain.Food.ProductSchema.shape.id,
+    userId: Domain.Food.ProductSchema.shape.userId,
+  }),
+  z.object({
+    name: Domain.Food.ProductSchema.shape.name,
+    userId: Domain.Food.ProductSchema.shape.userId,
+  }),
 ]);
 export async function findFirst_DTO(
   arg: FindFirstRequest,
@@ -86,7 +92,9 @@ export async function findFirst(
 
 // FIND MANY PRODUCTS
 export type FindManyRequest = z.infer<typeof FindManySchema>;
-export const FindManySchema = Domain.Food.ProductSchema.pick({ userId: true });
+export const FindManySchema = z.object({
+  userId: Domain.Food.ProductSchema.shape.userId,
+});
 export async function findMany_DTO(
   arg: FindManyRequest,
   context: { trx: PrismaTransaction },
