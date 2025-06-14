@@ -42,6 +42,8 @@ model Nutrients {
     fibers   Float @default(0) @db.Real
 
     product Product?
+
+    @@map("nutrients")
 }
 
 // model ProductComplex {
