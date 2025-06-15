@@ -1,27 +1,30 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: `../.env.${process.env.APP_ENV}` });
 
 import express, { Express } from 'express';
-
-// import cors from 'cors';
-import { App } from './app';
-import { prisma } from './prisma';
-
 import fs from 'fs';
 import path from 'path';
+
 import { Gateway } from '@libs/gateway';
-import { randomUUID } from 'crypto';
+
+// import cors from 'cors';
+import { DATABASE_URL, PORT, USER_ID } from './constants';
+import { App } from './app';
+import { DB } from './db';
 
 // const CORS_ORIGIN_WHITELIST: string[] = [];
-const PORT = Number(process.env.PORT);
 
 export async function configureApp(app: Express) {
   console.log('Importing actions... Start');
   await recursiveImport(path.resolve(__dirname, 'commands'));
   console.log('Importing actions... Done');
 
+  const db = new DB();
+
   try {
     console.log('Connecting to database... Start');
-    await prisma.$connect();
+    await DB.connect({ databaseUrl: DATABASE_URL });
     console.log('Connecting to database... Done');
   } catch (e) {
     console.error('Connecting to database... Error', e);
@@ -51,19 +54,12 @@ export async function configureApp(app: Express) {
         });
       }
 
-      const validationResult = action.validator.safeParse(req.body);
-      if (validationResult.error) {
-        throw Gateway.createRequestValidationException({
-          issues: validationResult.error.issues,
-        });
-      }
+      const requestContext: App.ICommandContext = App.createCommandContext({
+        db,
+        userId: USER_ID,
+      });
 
-      const requestContext: App.ICommandContext = {
-        prisma: prisma,
-        userId: randomUUID(), // TODO not random uuid
-      };
-
-      const actionResponse = await action.handler(validationResult.data, requestContext);
+      const actionResponse = await action.handler(req.body, requestContext);
 
       res.status(actionResponse.status).send(actionResponse).json().end();
     } catch (error) {

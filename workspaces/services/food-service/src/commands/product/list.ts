@@ -10,8 +10,8 @@ export default App.addCommand<
   Gateway.Food.Product.ListExceptions
 >('product/list', {
   validator: z.unknown(),
-  handler: async (_, { prisma, userId }) => {
-    return prisma.$noThrowTransaction(async trx => {
+  handler: async (_, { db, userId }) => {
+    return db.Client.$noThrowTransaction(async trx => {
       const listResult = await Components.Product.findMany_DTO({ userId }, { trx });
 
       if (!listResult.success) {

@@ -6,19 +6,21 @@ export default {
   projects: [
     {
       ...createDefaultPreset(),
+      rootDir: './workspaces/services/food-service',
       preset: 'ts-jest',
       testEnvironment: 'node',
       moduleNameMapper: {
-        '^#/(.*)$': '<rootDir>/workspaces/services/food-service/src/$1',
+        '^#/(.*)$': '<rootDir>/src/$1',
       },
       testMatch: [
-        '<rootDir>/workspaces/services/food-service/src/**/?(*.)+(spec|test).ts',
-        '<rootDir>/workspaces/services/food-service/src/**__test__/?(*.)+(spec|test).ts',
+        '<rootDir>/src/**/?(*.)+(spec|test).ts',
+        '<rootDir>/src/**__tests__/?(*.)+(spec|test).ts',
       ],
       resolver: undefined,
       clearMocks: false,
-      collectCoverage: true,
+      // collectCoverage: true,
       coverageDirectory: 'coverage',
+      setupFilesAfterEnv: ['./jest.setup.ts'],
     } satisfies Config,
   ],
 };

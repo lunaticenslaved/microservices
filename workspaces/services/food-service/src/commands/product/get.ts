@@ -11,8 +11,8 @@ export default App.addCommand<
   validator: z.object({
     id: Components.Product.DeleteOneSchema.shape.id,
   }),
-  handler: async ({ data }, { prisma, userId }) => {
-    return prisma.$noThrowTransaction(async trx => {
+  handler: async ({ data }, { db, userId }) => {
+    return db.Client.$noThrowTransaction(async trx => {
       const found = await Components.Product.findFirst_DTO(
         { id: data.id, userId },
         { trx },

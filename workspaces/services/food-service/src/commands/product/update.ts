@@ -8,8 +8,8 @@ App.addCommand<
   Gateway.Food.Product.UpdateResponse,
   Gateway.Food.Product.UpdateExceptions
 >('product/update', {
-  handler: async ({ data }, { prisma, userId }) => {
-    return await prisma.$noThrowTransaction(async trx => {
+  handler: async ({ data }, { db, userId }) => {
+    return await db.Client.$noThrowTransaction(async trx => {
       const product = await Components.Product.findFirst(
         { id: data.id, userId },
         { trx },

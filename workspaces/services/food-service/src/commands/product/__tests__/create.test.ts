@@ -1,61 +1,81 @@
-import { randomUUID } from 'crypto';
-import createAction from '../create';
-
-import { prisma } from '#/prisma';
 import { Gateway } from '@libs/gateway';
+import { randomUUID } from 'crypto';
+
+import createAction from '../create';
+import { DB } from '#/db';
+
+const db = new DB();
 
 describe('validator is valid', () => {
   test('name is trimmed', () => {
-    const parsed = createAction.validator.safeParse({
-      name: ' name ',
+    const request: Gateway.Food.Product.CreateRequest['data'] = {
+      name: { value: ' name ' },
       nutrients: {
-        calories: 0,
-        proteins: 0,
-        fats: 0,
-        carbs: 0,
-        fibers: 0,
+        calories: { value: 0 },
+        proteins: { value: 0 },
+        fats: { value: 0 },
+        carbs: { value: 0 },
+        fibers: { value: 0 },
       },
-    });
+    };
 
+    const parsed = createAction.validator.safeParse(request);
     expect(parsed.success).toBeTruthy();
 
     if (!parsed.success) return;
-
-    expect(parsed.data.name).toBe('name');
+    expect(parsed.data.name.value).toBe('name');
   });
 });
 
-test('test transaction rollback', async () => {
-  const result = await prisma?.$noThrowTransaction(async trx => {
-    await trx.product.create({
-      data: {
-        userId: randomUUID(),
-        name: 'product-1',
-        nutrients: {
-          create: {},
+describe('can create product', () => {
+  let productId: string;
+  let result: Gateway.Food.Product.CreateResponse | Gateway.Food.Product.CreateExceptions;
+
+  beforeAll(async () => {
+    result = await createAction.handler(
+      {
+        service: 'food',
+        command: 'product/create',
+        data: {
+          name: { value: 'product-1 ' },
         },
+      },
+      {
+        db,
+        userId: randomUUID(),
+      },
+    );
+
+    if (result.success) {
+      productId = result.data.id;
+    }
+  });
+
+  test('success result', () => {
+    expect(result.success).toBe(true);
+  });
+
+  test('status is 201', () => {
+    expect(result.status).toBe(201);
+  });
+
+  test('product created', async () => {
+    const found = await db.Client.product.findFirst({
+      where: {
+        id: productId,
       },
     });
 
-    if (![].length) {
-      return Gateway.createException({
-        type: 'test',
-        status: 400,
-        message: 'Message',
-        details: null,
-      });
-    }
-
-    return 1;
+    expect(found).toBeDefined();
   });
 
-  expect(result).toBeInstanceOf(Gateway.Exception);
+  test('name is trimmed', async () => {
+    const found = await db.Client.product.findFirst({
+      where: {
+        id: productId,
+      },
+    });
 
-  const product = await prisma?.product.findFirst({
-    where: {
-      name: 'product-1',
-    },
+    expect(found?.name).toBe('product-1');
   });
-
-  expect(!!product).toBeFalsy();
 });

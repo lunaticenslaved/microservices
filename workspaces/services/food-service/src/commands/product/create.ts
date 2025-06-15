@@ -12,8 +12,8 @@ export default App.addCommand<
     name: Components.Product.CreateSchema.shape.name,
     nutrients: Components.Nutrients.CreateSchema,
   }),
-  handler: async ({ data }, { prisma, userId }) => {
-    return prisma.$noThrowTransaction(async trx => {
+  handler: async ({ data }, { db, userId }) => {
+    return db.Client.$noThrowTransaction(async trx => {
       const nutrientsResult = await Components.Nutrients.create(data.nutrients, {
         trx,
       });

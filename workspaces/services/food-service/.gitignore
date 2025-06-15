@@ -23,7 +23,7 @@ dist-ssr
 
 
 node_modules/
-.env
+.env.dev
 .idea
 .yarn
 dist

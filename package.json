@@ -28,6 +28,6 @@
     "lint": "eslint ./workspaces --ext ts,tsx --report-unused-disable-directives --max-warnings=0 --quiet && prettier ./workspaces --check --log-level=warn",
     "lint:fix": "eslint ./workspaces --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix & prettier ./workspaces --write",
     "typecheck": "lerna run typecheck",
-    "test": "lerna run test"
+    "test": "APP_ENV=test jest"
   }
 }

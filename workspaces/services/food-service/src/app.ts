@@ -1,8 +1,10 @@
 import express, { Express } from 'express';
 import z from 'zod/v4';
-import { prisma } from './prisma';
-import { SERVICE } from '#/constants';
+
 import { Gateway } from '@libs/gateway';
+
+import { SERVICE } from '#/constants';
+import { DB } from '#/db';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const COMMANDS: Record<string, any> = {};
@@ -28,9 +30,26 @@ export class App {
       ...arg,
       command,
       service: SERVICE,
+      handler: (req: TReq, context: App.ICommandContext) => {
+        const validationResult = arg.validator.safeParse(req.data);
+
+        if (validationResult.error) {
+          throw Gateway.createRequestValidationException({
+            issues: validationResult.error.issues,
+          });
+        }
+
+        return arg.handler(
+          {
+            ...req,
+            data: validationResult.data,
+          },
+          context,
+        );
+      },
     };
 
-    return arg;
+    return COMMANDS[command];
   }
 
   static findCommand(action: string):
@@ -42,11 +61,17 @@ export class App {
     | undefined {
     return COMMANDS[action];
   }
+
+  static createCommandContext(arg: { db: DB; userId: string }): App.ICommandContext {
+    return {
+      ...arg,
+    };
+  }
 }
 
 export namespace App {
   export interface ICommandContext {
-    prisma: typeof prisma;
+    db: DB;
     userId: string;
   }
 }
