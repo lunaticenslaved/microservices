@@ -1,13 +1,13 @@
 import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
-import { Domain, Gateway } from '@libs/gateway';
+import { Gateway } from '@libs/gateway';
 
 export default App.addCommand<
-  Gateway.Food.Product.GetRequest,
-  Gateway.Food.Product.GetResponse,
-  Gateway.Food.Product.GetExceptions
->('product/get', {
+  Gateway.Food.Product.FindFirstRequest,
+  Gateway.Food.Product.FindFirstResponse,
+  Gateway.Food.Product.FindFirstExceptions
+>('product/find-first', {
   validator: z.object({
     id: Components.Product.DeleteOneSchema.shape.id,
   }),
@@ -17,10 +17,6 @@ export default App.addCommand<
         { id: data.id, userId },
         { trx },
       );
-
-      if (!found) {
-        return Gateway.createException(Domain.Food.createProductNotFoundException(data));
-      }
 
       return Gateway.createResponse({
         status: 200,

@@ -4,7 +4,10 @@ cat > "${TEMP_FILE}" << EOF
 {
     "message": "
 service: food\n
-action: product/create
+command: product/create\n
+data:\n
+  name: \n 
+    value: product-1\n
 "
 }
 EOF

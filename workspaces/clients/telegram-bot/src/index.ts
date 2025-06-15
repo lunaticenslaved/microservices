@@ -20,7 +20,7 @@ app.post('/message', async (req, res) => {
 
   // FIXME catch error send common error
   const actionRequest = YAML.parse(message);
-  console.log('[TELEGRAM BOT] Received message:', message, actionRequest);
+  console.log('[TELEGRAM BOT] Received message:', actionRequest);
 
   const validatedBody = Gateway.RequestSchema.safeParse(actionRequest);
 
@@ -30,16 +30,16 @@ app.post('/message', async (req, res) => {
         issues: validatedBody.error.issues,
       });
 
-    console.error('[TELEGRAM BOT] [ACT ERROR]', JSON.stringify(result, null, 2));
+    console.error('[TELEGRAM BOT] [COMMAND ERROR]', JSON.stringify(result, null, 2));
 
     res.status(result.status).send(result).json().end();
   } else {
     const result = await command(validatedBody.data.service)(validatedBody.data);
 
     if (!result.success) {
-      console.error('[TELEGRAM BOT] [ACT ERROR]', JSON.stringify(result, null, 2));
+      console.error('[TELEGRAM BOT] [COMMAND ERROR]', JSON.stringify(result, null, 2));
     } else {
-      console.log('[TELEGRAM BOT] [ACT SUCCESS]', JSON.stringify(result, null, 2));
+      console.log('[TELEGRAM BOT] [COMMAND SUCCESS]', JSON.stringify(result, null, 2));
     }
 
     res.status(result.status).send(result).json().end();

@@ -5,10 +5,10 @@ import { Gateway } from '@libs/gateway';
 import { nonReachable } from '#/utils';
 
 export default App.addCommand<
-  Gateway.Food.Product.ListRequest,
-  Gateway.Food.Product.ListResponse,
-  Gateway.Food.Product.ListExceptions
->('product/list', {
+  Gateway.Food.Product.FindManyRequest,
+  Gateway.Food.Product.FindManyResponse,
+  Gateway.Food.Product.FindManyExceptions
+>('product/find-many', {
   validator: z.unknown(),
   handler: async (_, { db, userId }) => {
     return db.Client.$noThrowTransaction(async trx => {

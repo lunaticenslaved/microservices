@@ -1,8 +1,9 @@
 import dotenv from 'dotenv';
 
-dotenv.config({ path: `../.env.${process.env.APP_ENV}` });
+// TODO do not like this approach
+dotenv.config({ path: process.env.APP_ENV === 'test' ? `../.env.test` : '../.env' });
 
-import express, { Express } from 'express';
+import express from 'express';
 import fs from 'fs';
 import path from 'path';
 
@@ -15,19 +16,19 @@ import { DB } from './db';
 
 // const CORS_ORIGIN_WHITELIST: string[] = [];
 
-export async function configureApp(app: Express) {
-  console.log('Importing actions... Start');
+export async function start() {
+  console.log('[FOOD SERVICE] Importing actions... Start');
   await recursiveImport(path.resolve(__dirname, 'commands'));
-  console.log('Importing actions... Done');
+  console.log('[FOOD SERVICE] Importing actions... Done');
 
   const db = new DB();
 
   try {
-    console.log('Connecting to database... Start');
+    console.log('[FOOD SERVICE] Connecting to database... Start');
     await DB.connect({ databaseUrl: DATABASE_URL });
-    console.log('Connecting to database... Done');
+    console.log('[FOOD SERVICE] Connecting to database... Done');
   } catch (e) {
-    console.error('Connecting to database... Error', e);
+    console.error('[FOOD SERVICE] Connecting to database... Error', e);
   }
 
   // FIXME what is it?
@@ -46,11 +47,13 @@ export async function configureApp(app: Express) {
     try {
       res.setHeader('content-type', 'application/json');
 
-      const actionType = req.body?.action;
-      const action = App.findCommand(actionType);
-      if (!action) {
+      console.log('[FOOD SERVICE] [COMMAND]', JSON.stringify(req.body, null, 2));
+
+      const commandType = req.body?.command;
+      const command = App.findCommand(commandType);
+      if (!command) {
         throw Gateway.createUnknownActionException({
-          action: actionType,
+          action: commandType,
         });
       }
 
@@ -59,10 +62,12 @@ export async function configureApp(app: Express) {
         userId: USER_ID,
       });
 
-      const actionResponse = await action.handler(req.body, requestContext);
+      const response = await command.handler(req.body, requestContext);
 
-      res.status(actionResponse.status).send(actionResponse).json().end();
+      res.status(response.status).send(response).json().end();
     } catch (error) {
+      console.error('[FOOD SERVICE] [COMMAND]', error);
+
       if (error instanceof Gateway.Exception) {
         res.status(error.status).send(error).json().end();
       } else {
@@ -79,8 +84,8 @@ export async function configureApp(app: Express) {
 
   // FIXME handle unknown route
 
-  app.listen(PORT, () => {
-    console.log(`Food service is up and running on port ${PORT}!`);
+  App.express.listen(PORT, () => {
+    console.log(`[FOOD SERVICE] Up and running on port ${PORT}!`);
   });
 }
 
@@ -107,4 +112,4 @@ async function recursiveImport(dir: string) {
   }
 }
 
-configureApp(express());
+start();

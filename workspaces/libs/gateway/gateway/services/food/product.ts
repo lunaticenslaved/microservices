@@ -1,7 +1,7 @@
-import { Gateway } from '..';
+import { Gateway } from '../../../gateway';
+import { Domain } from '../../../domain';
 
-import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from '../common';
-import { Domain } from '../../domain';
+import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from '../../common';
 
 export namespace Product {
   export type DTO = {
@@ -60,15 +60,13 @@ export namespace Product {
   export type DeleteResponse = Gateway.IResponse<void>;
   export type DeleteRequest = Gateway.IRequest<'product/delete', { id: string }>;
 
-  // GET -----------------------------------------------------------------------------------
-  export type GetExceptions =
-    | Domain.Food.ProductNotFoundException
-    | Gateway.CommonExceptions;
-  export type GetResponse = Gateway.IResponse<DTO>;
-  export type GetRequest = Gateway.IRequest<'product/get', { id: string }>;
+  // FIND FIRST ----------------------------------------------------------------------------
+  export type FindFirstExceptions = Gateway.CommonExceptions;
+  export type FindFirstResponse = Gateway.IResponse<DTO | null>;
+  export type FindFirstRequest = Gateway.IRequest<'product/find-first', { id: string }>;
 
-  // LIST ----------------------------------------------------------------------------------
-  export type ListExceptions = Gateway.CommonExceptions;
-  export type ListRequest = Gateway.IRequest<'product/list', unknown>;
-  export type ListResponse = Gateway.IResponse<{ items: DTO[] }>;
+  // FIND MANY -----------------------------------------------------------------------------
+  export type FindManyExceptions = Gateway.CommonExceptions;
+  export type FindManyRequest = Gateway.IRequest<'product/find-many', unknown>;
+  export type FindManyResponse = Gateway.IResponse<{ items: DTO[] }>;
 }
