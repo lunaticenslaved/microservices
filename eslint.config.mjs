@@ -25,4 +25,8 @@ export default defineConfig([
     ignores: ['node_modules'],
   },
   prettier,
-]);
+], {
+  ignores: [
+    '**/src/db/generated'
+  ]
+});

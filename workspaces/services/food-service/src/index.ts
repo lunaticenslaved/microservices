@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
-
-// TODO do not like this approach
-dotenv.config({ path: process.env.APP_ENV === 'test' ? `../.env.test` : '../.env' });
+import 'dotenv/config';
 
 import express from 'express';
 import fs from 'fs';

@@ -20,6 +20,7 @@ export default {
       clearMocks: false,
       // collectCoverage: true,
       coverageDirectory: 'coverage',
+      setupFiles: ['./jest.env.ts'],
       setupFilesAfterEnv: ['./jest.setup.ts'],
     } satisfies Config,
   ],

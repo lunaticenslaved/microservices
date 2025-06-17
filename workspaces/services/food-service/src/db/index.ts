@@ -1,5 +1,5 @@
 import { Gateway } from '@libs/gateway';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from './generated/client';
 
 function createClient(arg: { databaseUrl: string }) {
   const _prisma = new PrismaClient({ datasourceUrl: arg.databaseUrl });

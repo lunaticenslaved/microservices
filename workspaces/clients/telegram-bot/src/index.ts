@@ -5,7 +5,7 @@ import axios, { AxiosError } from 'axios';
 import YAML from 'yaml';
 import { Gateway } from '@libs/gateway';
 
-const PORT = Number(process.env.PORT__TELEGRAM_BOT);
+const PORT = 5001;
 
 const app = express();
 

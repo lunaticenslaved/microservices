@@ -3,10 +3,7 @@ import {
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
 import { execSync } from 'child_process';
-import dotenv from 'dotenv';
 import { DB } from './src/db';
-
-dotenv.config({ path: './.env.test' });
 
 declare global {
   // eslint-disable-next-line no-var

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "typecheck": "tsc --project ./tsconfig.json --noEmit",
-    "test": "APP_ENV=test jest --config ./jest.config.ts"
+    "test": "APP_ENV=test jest --config ./jest.config.ts",
+    "prisma:generate": "prisma generate --schema ./prisma/schema.prisma"
   },
   "author": "",
   "license": "ISC",
