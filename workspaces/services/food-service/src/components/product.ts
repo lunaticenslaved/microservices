@@ -1,6 +1,7 @@
 import z from 'zod/v4';
 import { DB } from '#/db';
-import { ServiceUtils, Domain, Result, Gateway, ResultSuccess } from '@libs/gateway';
+import { Domain, Result, Gateway, ResultSuccess } from '@libs/gateway';
+import { ServiceUtils } from '@libs/service';
 
 const DTO_SELECT = {
   id: true,

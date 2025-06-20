@@ -1,6 +1,7 @@
 import { z } from 'zod/v4';
 import { DB } from '#/db';
-import { ServiceUtils, Gateway, Result, Domain, ResultSuccess } from '@libs/gateway';
+import { Gateway, Result, Domain, ResultSuccess } from '@libs/gateway';
+import { ServiceUtils } from '@libs/service';
 
 // CREATE NUTRIENTS ------------------------------------------------------------------------
 export type CreateRequest = z.infer<typeof CreateSchema>;

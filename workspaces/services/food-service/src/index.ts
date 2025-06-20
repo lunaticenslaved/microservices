@@ -13,6 +13,8 @@ import { DB } from './db';
 
 // const CORS_ORIGIN_WHITELIST: string[] = [];
 
+const expressServer = express();
+
 export async function start() {
   console.log('[FOOD SERVICE] Importing actions... Start');
   await recursiveImport(path.resolve(__dirname, 'commands'));
@@ -38,9 +40,9 @@ export async function start() {
   //   }),
   // );
 
-  App.express.use(express.json());
+  expressServer.use(express.json());
 
-  App.express.post('/command', async (req, res) => {
+  expressServer.post('/command', async (req, res) => {
     try {
       res.setHeader('content-type', 'application/json');
 
@@ -54,7 +56,7 @@ export async function start() {
         });
       }
 
-      const requestContext: App.ICommandContext = App.createCommandContext({
+      const requestContext = App.createCommandContext({
         db,
         userId: USER_ID,
       });
@@ -81,7 +83,7 @@ export async function start() {
 
   // FIXME handle unknown route
 
-  App.express.listen(PORT, () => {
+  expressServer.listen(PORT, () => {
     console.log(`[FOOD SERVICE] Up and running on port ${PORT}!`);
   });
 }
