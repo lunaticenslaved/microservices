@@ -28,7 +28,8 @@ model Tag {
   service  Service
   itemType ItemType @map("item_type")
   itemId   String   @map("item_id") @db.Uuid
+  tag      String   @db.VarChar(255)
 
-  @@unique([userId, service, itemType, itemId])
+  @@unique([userId, tag])
   @@map("tag")
 }

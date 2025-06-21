@@ -11,9 +11,10 @@ CREATE TABLE "tag" (
     "service" "Service" NOT NULL,
     "item_type" "ItemType" NOT NULL,
     "item_id" UUID NOT NULL,
+    "tag" VARCHAR(255) NOT NULL,
 
     CONSTRAINT "tag_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "tag_user_id_service_item_type_item_id_key" ON "tag"("user_id", "service", "item_type", "item_id");
+CREATE UNIQUE INDEX "tag_user_id_tag_key" ON "tag"("user_id", "tag");

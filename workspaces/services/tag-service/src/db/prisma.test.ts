@@ -8,6 +8,7 @@ const data = {
   service: Service.Food,
   itemType: ItemType.Product,
   itemId: randomUUID(),
+  tag: 'tag',
 };
 
 test('test transaction rollback', async () => {
