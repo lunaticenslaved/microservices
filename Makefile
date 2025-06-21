@@ -22,7 +22,7 @@ setup:
 	make env
 
 dev:
-	npx dotenv -e .env npx lerna run dev
+	docker-compose up -d && npx dotenv -e .env npx lerna run dev
 
 typecheck:
 	npx lerna run typecheck
