@@ -15,5 +15,6 @@
       "#/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "exclude": ["./src/db/generated/*"],
+  "include": ["./src"]
 }

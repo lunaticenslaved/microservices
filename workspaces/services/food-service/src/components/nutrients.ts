@@ -1,5 +1,5 @@
 import { z } from 'zod/v4';
-import { DB } from '#/db';
+import { PrismaTransaction } from '#/db';
 import { Gateway, Result, Domain, ResultSuccess } from '@libs/gateway';
 import { ServiceUtils } from '@libs/service';
 
@@ -26,7 +26,7 @@ export const CreateSchema = z
   .optional();
 export async function create(
   data: CreateRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<Result<{ id: string }, Gateway.RequestValidationException>> {
   const parsed = z.safeParse(CreateSchema, data);
 
@@ -92,7 +92,7 @@ export const UpdateSchema = z.object({
 });
 export async function update(
   data: UpdateRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<Result<void, Gateway.RequestValidationException>> {
   const parsed = z.safeParse(UpdateSchema, data);
 
@@ -135,7 +135,7 @@ export const DeleteManySchema = z.object({
 });
 export async function deleteMany(
   arg: DeleteManyRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<ResultSuccess<{ count: number }>> {
   const { count } = await context.trx.nutrients.deleteMany({
     where: {

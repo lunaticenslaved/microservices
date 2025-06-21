@@ -12,9 +12,7 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "#/*": ["./src/*"]
+      "#/*": ["./*"]
     }
-  },
-  "exclude": ["./src/**/generated"],
-  "include": ["./src"]
+  }
 }

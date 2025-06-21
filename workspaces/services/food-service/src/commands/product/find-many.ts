@@ -3,6 +3,7 @@ import { Components } from '#/components';
 import z from 'zod/v4';
 import { Gateway } from '@libs/gateway';
 import { nonReachable } from '#/utils';
+import { Database } from '#/db';
 
 export default App.addCommand<
   Gateway.Food.Product.FindManyRequest,
@@ -10,9 +11,12 @@ export default App.addCommand<
   Gateway.Food.Product.FindManyExceptions
 >('product/find-many', {
   validator: z.unknown(),
-  handler: async (_, { db, userId }) => {
-    return db.Client.$noThrowTransaction(async trx => {
-      const listResult = await Components.Product.findMany_DTO({ userId }, { trx });
+  handler: async (_, { user }) => {
+    return Database.prisma.$noThrowTransaction(async trx => {
+      const listResult = await Components.Product.findMany_DTO(
+        { userId: user.id },
+        { trx },
+      );
 
       if (!listResult.success) {
         nonReachable(listResult.success);

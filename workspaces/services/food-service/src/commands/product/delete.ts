@@ -2,6 +2,7 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Domain, Gateway } from '@libs/gateway';
+import { Database } from '#/db';
 
 export default App.addCommand<
   Gateway.Food.Product.DeleteRequest,
@@ -11,12 +12,12 @@ export default App.addCommand<
   validator: z.object({
     id: Components.Product.DeleteOneSchema.shape.id,
   }),
-  handler: async ({ data }, { db, userId }) => {
-    return db.Client.$noThrowTransaction(async trx => {
+  handler: async ({ data }, { user }) => {
+    return Database.prisma.$noThrowTransaction(async trx => {
       const found = await Components.Product.findFirst(
         {
           id: data.id,
-          userId,
+          userId: user.id,
         },
         { trx },
       );
@@ -26,7 +27,7 @@ export default App.addCommand<
       }
 
       const deleteResult = await Components.Product.deleteOne(
-        { id: found.id, userId },
+        { id: found.id, userId: user.id },
         { trx },
       );
 

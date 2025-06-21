@@ -1,5 +1,5 @@
 import z from 'zod/v4';
-import { DB } from '#/db';
+import { PrismaTransaction } from '#/db';
 import { Domain, Result, Gateway, ResultSuccess } from '@libs/gateway';
 import { ServiceUtils } from '@libs/service';
 
@@ -20,7 +20,7 @@ const DTO_SELECT = {
 // CHECK IF NAME UNIQUE -----------------------------------------------------------------
 async function checkIfNameUnique(
   arg: { name: string },
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<{ unique: boolean }> {
   const found = await context.trx.product.findFirst({
     where: {
@@ -50,7 +50,7 @@ export const FindFirstSchema = z.union([
 ]);
 export async function findFirst_DTO(
   arg: FindFirstRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<Gateway.Food.Product.DTO | null> {
   if ('id' in arg) {
     return await context.trx.product.findFirst({
@@ -72,7 +72,7 @@ export async function findFirst_DTO(
 }
 export async function findFirst(
   arg: FindFirstRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<Domain.Food.Product | null> {
   const select = {
     id: true,
@@ -107,7 +107,7 @@ export const FindManySchema = z.object({
 });
 export async function findMany_DTO(
   arg: FindManyRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<ResultSuccess<Gateway.Food.Product.DTO[]>> {
   const items = await context.trx.product.findMany({
     select: DTO_SELECT,
@@ -128,7 +128,7 @@ export const CreateSchema = z.object({
 });
 export async function create(
   arg: CreateRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<Result<{ id: string }, Domain.Food.ProductNameNotUniqueException>> {
   const name = arg.name.value;
 
@@ -160,7 +160,7 @@ export const UpdateSchema = z.object({
 });
 export async function update(
   arg: UpdateRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<
   Result<
     null,
@@ -203,7 +203,7 @@ export const DeleteOneSchema = z.object({
 });
 export async function deleteOne(
   arg: DeleteOneRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<Result<void, Domain.Food.ProductNotFoundException>> {
   const found = await findFirst(arg, context);
 
@@ -222,7 +222,7 @@ export const DeleteManySchema = z.object({
 });
 export async function deleteMany(
   arg: DeleteManyRequest,
-  context: { trx: DB.Transaction },
+  context: { trx: PrismaTransaction },
 ): Promise<ResultSuccess<{ count: number }>> {
   const { count } = await context.trx.product.deleteMany({
     where: {

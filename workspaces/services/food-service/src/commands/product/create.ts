@@ -2,6 +2,7 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Gateway } from '@libs/gateway';
+import { Database } from '#/db';
 
 export default App.addCommand<
   Gateway.Food.Product.CreateRequest,
@@ -12,8 +13,8 @@ export default App.addCommand<
     name: Components.Product.CreateSchema.shape.name,
     nutrients: Components.Nutrients.CreateSchema,
   }),
-  handler: async ({ data }, { db, userId }) => {
-    return db.Client.$noThrowTransaction(async trx => {
+  handler: async ({ data }, { user }) => {
+    return Database.prisma.$noThrowTransaction(async trx => {
       const nutrientsResult = await Components.Nutrients.create(data.nutrients, {
         trx,
       });
@@ -24,7 +25,7 @@ export default App.addCommand<
 
       const createResult = await Components.Product.create(
         {
-          userId,
+          userId: user.id,
           name: data.name,
           nutrientsId: nutrientsResult.data.id,
         },
@@ -39,7 +40,7 @@ export default App.addCommand<
 
       const productId = createResult.data.id;
       const created = await Components.Product.findFirst_DTO(
-        { id: productId, userId },
+        { id: productId, userId: user.id },
         { trx },
       );
 

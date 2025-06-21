@@ -2,16 +2,17 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Domain, Gateway } from '@libs/gateway';
+import { Database } from '#/db';
 
 App.addCommand<
   Gateway.Food.Product.UpdateRequest,
   Gateway.Food.Product.UpdateResponse,
   Gateway.Food.Product.UpdateExceptions
 >('product/update', {
-  handler: async ({ data }, { db, userId }) => {
-    return await db.Client.$noThrowTransaction(async trx => {
+  handler: async ({ data }, { user }) => {
+    return await Database.prisma.$noThrowTransaction(async trx => {
       const product = await Components.Product.findFirst(
-        { id: data.id, userId },
+        { id: data.id, userId: user.id },
         { trx },
       );
 
@@ -29,7 +30,7 @@ App.addCommand<
       );
 
       const updated = await Components.Product.findFirst_DTO(
-        { id: data.id, userId },
+        { id: data.id, userId: user.id },
         { trx },
       );
 

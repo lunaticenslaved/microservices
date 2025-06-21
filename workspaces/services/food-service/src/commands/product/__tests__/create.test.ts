@@ -1,10 +1,8 @@
 import { Gateway } from '@libs/gateway';
-import { randomUUID } from 'crypto';
 
 import createAction from '../create';
-import { DB } from '#/db';
-
-const db = new DB();
+import { createTestCommandContext } from '#/utils-test';
+import { Database } from '#/db';
 
 describe('validator is valid', () => {
   test('name is trimmed', () => {
@@ -40,10 +38,7 @@ describe('can create product', () => {
           name: { value: 'product-1 ' },
         },
       },
-      {
-        db,
-        userId: randomUUID(),
-      },
+      createTestCommandContext(),
     );
 
     if (result.success) {
@@ -60,22 +55,12 @@ describe('can create product', () => {
   });
 
   test('product created', async () => {
-    const found = await db.Client.product.findFirst({
+    const found = await Database.prisma.product.findFirst({
       where: {
         id: productId,
       },
     });
 
     expect(found).toBeDefined();
-  });
-
-  test('name is trimmed', async () => {
-    const found = await db.Client.product.findFirst({
-      where: {
-        id: productId,
-      },
-    });
-
-    expect(found?.name).toBe('product-1');
   });
 });

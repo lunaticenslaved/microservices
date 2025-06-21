@@ -1,5 +1,10 @@
 import z from 'zod/v4';
-import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from './gateway/common';
+import {
+  NumberCreate,
+  NumberUpdate,
+  StringCreate,
+  StringUpdate,
+} from '@libs/gateway/gateway/common';
 
 // TODO move it somewhere
 

@@ -10,7 +10,7 @@ export type CommandContext = {
 
 export const App = new Service<AppConfig, CommandContext>({
   config: {
-    service: 'food',
+    service: 'tag',
     env: process.env.APP_ENV as AppEnv, // TODO Check in app
   },
 });

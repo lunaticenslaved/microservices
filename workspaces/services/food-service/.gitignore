@@ -22,7 +22,7 @@ dist-ssr
 *.sw?
 
 
-src/db/generated/
+src/**/generated/
 node_modules/
 .env
 .idea

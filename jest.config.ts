@@ -23,5 +23,24 @@ export default {
       setupFiles: ['./jest.env.ts'],
       setupFilesAfterEnv: ['./jest.setup.ts'],
     } satisfies Config,
+    {
+      ...createDefaultPreset(),
+      rootDir: './workspaces/services/tag-service',
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      moduleNameMapper: {
+        '^#/(.*)$': '<rootDir>/src/$1',
+      },
+      testMatch: [
+        '<rootDir>/src/**/?(*.)+(spec|test).ts',
+        '<rootDir>/src/**__tests__/?(*.)+(spec|test).ts',
+      ],
+      resolver: undefined,
+      clearMocks: false,
+      // collectCoverage: true,
+      coverageDirectory: 'coverage',
+      setupFiles: ['./jest.env.ts'],
+      setupFilesAfterEnv: ['./jest.setup.ts'],
+    } satisfies Config,
   ],
 };
