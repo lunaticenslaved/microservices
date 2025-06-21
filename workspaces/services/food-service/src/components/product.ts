@@ -1,7 +1,8 @@
 import z from 'zod/v4';
 import { PrismaTransaction } from '#/db';
-import { Domain, Result, Gateway, ResultSuccess } from '@libs/gateway';
+import { Gateway } from '@libs/gateway';
 import { ServiceUtils } from '@libs/service';
+import { Domain, Result, ResultSuccess } from '@libs/domain';
 
 const DTO_SELECT = {
   id: true,
@@ -129,13 +130,13 @@ export const CreateSchema = z.object({
 export async function create(
   arg: CreateRequest,
   context: { trx: PrismaTransaction },
-): Promise<Result<{ id: string }, Domain.Food.ProductNameNotUniqueException>> {
+): Promise<Result<{ id: string }, Gateway.Food.Product.NameNotUniqueException>> {
   const name = arg.name.value;
 
   const { unique } = await checkIfNameUnique({ name }, context);
 
   if (!unique) {
-    return Result.error(Domain.Food.createProductNameNotUniqueException({ name }));
+    return Result.error(Gateway.Food.Product.createNameNotUniqueException({ name }));
   }
 
   const created = await context.trx.product.create({
@@ -164,7 +165,7 @@ export async function update(
 ): Promise<
   Result<
     null,
-    Domain.Food.ProductNameNotUniqueException | Gateway.RequestValidationException
+    Gateway.Food.Product.NameNotUniqueException | Gateway.RequestValidationException
   >
 > {
   const parsed = z.safeParse(UpdateSchema, arg);
@@ -179,7 +180,7 @@ export async function update(
   const name = arg.name.value;
   const { unique } = await checkIfNameUnique({ name }, context);
   if (!unique) {
-    return Result.error(Domain.Food.createProductNameNotUniqueException({ name }));
+    return Result.error(Gateway.Food.Product.createNameNotUniqueException({ name }));
   }
 
   // Update product
@@ -204,11 +205,11 @@ export const DeleteOneSchema = z.object({
 export async function deleteOne(
   arg: DeleteOneRequest,
   context: { trx: PrismaTransaction },
-): Promise<Result<void, Domain.Food.ProductNotFoundException>> {
+): Promise<Result<void, Gateway.Food.Product.NotFoundException>> {
   const found = await findFirst(arg, context);
 
   if (!found) {
-    return Result.error(Domain.Food.createProductNotFoundException(arg));
+    return Result.error(Gateway.Food.Product.createNotFoundException(arg));
   }
 
   return Result.success(undefined);

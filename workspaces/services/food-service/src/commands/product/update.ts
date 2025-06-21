@@ -1,7 +1,7 @@
 import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
-import { Domain, Gateway } from '@libs/gateway';
+import { Gateway } from '@libs/gateway';
 import { Database } from '#/db';
 
 App.addCommand<
@@ -17,7 +17,7 @@ App.addCommand<
       );
 
       if (!product) {
-        return Domain.Food.createProductNotFoundException({ id: data.id });
+        return Gateway.Food.Product.createNotFoundException({ id: data.id });
       }
 
       if (data.name) {

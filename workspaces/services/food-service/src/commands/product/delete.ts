@@ -1,7 +1,7 @@
 import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
-import { Domain, Gateway } from '@libs/gateway';
+import { Gateway } from '@libs/gateway';
 import { Database } from '#/db';
 
 export default App.addCommand<
@@ -23,7 +23,7 @@ export default App.addCommand<
       );
 
       if (!found) {
-        return Domain.Food.createProductNotFoundException({ id: data.id });
+        return Gateway.Food.Product.createNotFoundException({ id: data.id });
       }
 
       const deleteResult = await Components.Product.deleteOne(

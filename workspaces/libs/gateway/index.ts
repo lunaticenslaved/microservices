@@ -1,4 +1,2 @@
-export { Gateway } from './gateway';
-export { Domain } from './domain';
-
-export { Result, type ResultSuccess } from './utils.results';
+export * as Gateway from './index-ns';
+export * from './common';

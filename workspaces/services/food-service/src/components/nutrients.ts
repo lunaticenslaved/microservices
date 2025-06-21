@@ -1,7 +1,8 @@
 import { z } from 'zod/v4';
 import { PrismaTransaction } from '#/db';
-import { Gateway, Result, Domain, ResultSuccess } from '@libs/gateway';
+import { Gateway } from '@libs/gateway';
 import { ServiceUtils } from '@libs/service';
+import { Domain, Result, ResultSuccess } from '@libs/domain';
 
 // CREATE NUTRIENTS ------------------------------------------------------------------------
 export type CreateRequest = z.infer<typeof CreateSchema>;
