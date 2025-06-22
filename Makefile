@@ -1,3 +1,4 @@
+gateway_env_file="workspaces/services/gateway/.env"
 food_env_file="workspaces/services/food-service/.env"
 tag_env_file="workspaces/services/tag-service/.env"
 
@@ -5,6 +6,10 @@ env:
 	npx dotenv -e .env make write-env
 
 write-env:
+	echo "PORT=${GATEWAY__PORT}" > ${gateway_env_file}
+	echo "ENDPOINT__FOOD_SERVICE=${FOOD_SERVICE__ENDPOINT}" >> ${gateway_env_file}
+	echo "ENDPOINT__TAG_SERVICE=${TAG_SERVICE__ENDPOINT}" >> ${gateway_env_file}
+
 	echo "APP_ENV=${APP_ENV}" > ${food_env_file}
 	echo "PORT=${FOOD_SERVICE__PORT}" >> ${food_env_file}
 	echo "DATABASE_URL=${FOOD_SERVICE__DATABASE_URL}" >> ${food_env_file}
@@ -22,7 +27,7 @@ setup:
 	make env
 
 dev:
-	docker-compose up -d && npx dotenv -e .env npx lerna run dev
+	docker-compose up -d && make env && npx dotenv -e .env npx lerna run dev
 
 typecheck:
 	npx lerna run typecheck

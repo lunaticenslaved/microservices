@@ -1,14 +1,28 @@
+import { Services } from './services';
 import { z } from 'zod/v4';
 
-export type IRequest<TCommand extends string, TData> = {
-  service: 'food';
+export type IRequest<
+  TCommand extends `${Services}/${string}` = `${Services}/${string}`,
+  TData = unknown,
+> = {
   command: TCommand;
   data: TData;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const RequestSchema: z.ZodType<IRequest<any, any>> = z.object({
-  service: z.literal('food'),
-  command: z.string(),
+export const RequestSchema = z.object({
+  command: z.custom<`${Services}/${string}`>(
+    (value): value is `${Services}/${string}` => {
+      const [service] = String(value).split('/');
+
+      return Object.values(Services).includes(service as Services);
+    },
+    { message: 'Must be in format `${Service}/string`' },
+  ),
   data: z.any(),
 });
+
+export function getServiceFromRequest(req: IRequest) {
+  const service = req.command.split('/')[0] as Services;
+
+  return service;
+}

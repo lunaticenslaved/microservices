@@ -9,7 +9,7 @@ export default App.addCommand<
   Gateway.Food.Product.FindManyRequest,
   Gateway.Food.Product.FindManyResponse,
   Gateway.Food.Product.FindManyExceptions
->('product/find-many', {
+>('food/product/find-many', {
   validator: z.unknown(),
   handler: async (_, { user }) => {
     return Database.prisma.$noThrowTransaction(async trx => {

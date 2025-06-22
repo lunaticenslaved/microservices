@@ -42,7 +42,7 @@ export namespace Product {
   export type CreateExceptions = NameNotUniqueException | Gateway.CommonExceptions;
   export type CreateResponse = Gateway.IResponse<DTO>;
   export type CreateRequest = Gateway.IRequest<
-    'product/create',
+    'food/product/create',
     {
       name: StringCreate;
       nutrients?: {
@@ -62,7 +62,7 @@ export namespace Product {
     | Gateway.CommonExceptions;
   export type UpdateResponse = Gateway.IResponse<DTO>;
   export type UpdateRequest = Gateway.IRequest<
-    'product/update',
+    'food/product/update',
     {
       id: string;
       name?: StringUpdate;
@@ -79,15 +79,18 @@ export namespace Product {
   // DELETE --------------------------------------------------------------------------------
   export type DeleteExceptions = NotFoundException | Gateway.CommonExceptions;
   export type DeleteResponse = Gateway.IResponse<void>;
-  export type DeleteRequest = Gateway.IRequest<'product/delete', { id: string }>;
+  export type DeleteRequest = Gateway.IRequest<'food/product/delete', { id: string }>;
 
   // FIND FIRST ----------------------------------------------------------------------------
   export type FindFirstExceptions = Gateway.CommonExceptions;
   export type FindFirstResponse = Gateway.IResponse<DTO | null>;
-  export type FindFirstRequest = Gateway.IRequest<'product/find-first', { id: string }>;
+  export type FindFirstRequest = Gateway.IRequest<
+    'food/product/find-first',
+    { id: string }
+  >;
 
   // FIND MANY -----------------------------------------------------------------------------
   export type FindManyExceptions = Gateway.CommonExceptions;
-  export type FindManyRequest = Gateway.IRequest<'product/find-many', unknown>;
+  export type FindManyRequest = Gateway.IRequest<'food/product/find-many', unknown>;
   export type FindManyResponse = Gateway.IResponse<{ items: DTO[] }>;
 }

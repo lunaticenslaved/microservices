@@ -12,8 +12,10 @@ const USER_ID = '23800be6-0aca-4d35-8ba6-8daa70e53ea2';
 // import cors from 'cors';
 // const CORS_ORIGIN_WHITELIST: string[] = [];
 
+type Command = `${Gateway.Services}/${string}`;
+
 type CommandConfig<
-  TReq extends Gateway.IRequest<string, unknown>,
+  TReq extends Gateway.IRequest<Command, unknown>,
   TRes extends Gateway.IResponse<unknown>,
   TErr extends Gateway.IException<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
   ICommandContext,
@@ -35,7 +37,7 @@ export class Service<TConfig extends ServiceConfig, TCommandContext> {
   private commands: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   addCommand<
-    TReq extends Gateway.IRequest<string, unknown>,
+    TReq extends Gateway.IRequest<Command, unknown>,
     TRes extends Gateway.IResponse<unknown>,
     TErr extends Gateway.Exception<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
   >(
@@ -106,12 +108,12 @@ export class Service<TConfig extends ServiceConfig, TCommandContext> {
       try {
         res.setHeader('content-type', 'application/json');
 
-        console.log(`[${serviceTitle}] [COMMAND]`, JSON.stringify(req.body, null, 2));
+        console.log(`[${serviceTitle}] [COMMAND]`, req.body);
 
         const commandType = req.body?.command;
         const command = this.findCommand(commandType);
         if (!command) {
-          throw Gateway.createUnknownActionException({
+          throw Gateway.createUnknownCommandException({
             action: commandType,
           });
         }
@@ -123,11 +125,17 @@ export class Service<TConfig extends ServiceConfig, TCommandContext> {
           },
         });
 
-        const validationResult = command.validator.safeParse(req.body);
-
-        if (validationResult.error) {
+        const requestValidated = Gateway.RequestSchema.safeParse(req.body);
+        if (!requestValidated.success) {
           throw Gateway.createRequestValidationException({
-            issues: validationResult.error.issues,
+            issues: requestValidated.error.issues,
+          });
+        }
+
+        const commandValidator = command.validator.safeParse(requestValidated.data.data);
+        if (commandValidator.error) {
+          throw Gateway.createRequestValidationException({
+            issues: commandValidator.error.issues,
           });
         }
 

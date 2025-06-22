@@ -1,18 +1,21 @@
 import { ZodIssue } from 'zod/v4';
+import { createException, IException } from './Exception';
 
 export { type IException, Exception, createException } from './Exception';
-export { type IRequest, RequestSchema } from './Request';
+export { type IRequest, RequestSchema, getServiceFromRequest } from './Request';
 export { type IResponse, createResponse } from './Response';
+export { Services } from './services';
 
+// Services
 export * as Food from './services/food';
-
-import { createException, IException } from './Exception';
+// export * as Tag from './services/tag';
 
 // COMMON EXCEPTIONS -------------------------------------------------------------------------
 export type CommonExceptions =
   | RequestValidationException
-  | UnknownActionException
-  | UnknownException;
+  | UnknownCommandException
+  | UnknownException
+  | MicroserviceTimeoutException;
 
 export type RequestValidationException = IException<
   'common/validation-error',
@@ -29,10 +32,10 @@ export function createRequestValidationException(arg: {
   });
 }
 
-export type UnknownActionException = IException<'common/unknown-action'>;
-export function createUnknownActionException(arg: {
+export type UnknownCommandException = IException<'common/unknown-action'>;
+export function createUnknownCommandException(arg: {
   action: unknown;
-}): UnknownActionException {
+}): UnknownCommandException {
   return createException({
     type: 'common/unknown-action',
     status: 400,
@@ -47,6 +50,26 @@ export function createUnknownException(): UnknownException {
     type: 'common/unknown-error',
     status: 500,
     message: 'Unknown error',
+    details: null,
+  });
+}
+
+export type MicroserviceTimeoutException = IException<'common/microservice-timeout'>;
+export function createMicroserviceTimeoutException(): MicroserviceTimeoutException {
+  return createException({
+    type: 'common/microservice-timeout',
+    status: 504,
+    message: 'Microservice timeout',
+    details: null,
+  });
+}
+
+export type GatewayException = IException<'common/gateway-error'>;
+export function createGatewayException(): GatewayException {
+  return createException({
+    type: 'common/gateway-error',
+    status: 500,
+    message: 'Gateway error',
     details: null,
   });
 }

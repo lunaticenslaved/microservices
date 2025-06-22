@@ -8,7 +8,7 @@ export default App.addCommand<
   Gateway.Food.Product.FindFirstRequest,
   Gateway.Food.Product.FindFirstResponse,
   Gateway.Food.Product.FindFirstExceptions
->('product/find-first', {
+>('food/product/find-first', {
   validator: z.object({
     id: Components.Product.DeleteOneSchema.shape.id,
   }),

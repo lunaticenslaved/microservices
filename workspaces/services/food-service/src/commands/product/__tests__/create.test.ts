@@ -32,8 +32,7 @@ describe('can create product', () => {
   beforeAll(async () => {
     result = await createAction.handler(
       {
-        service: 'food',
-        command: 'product/create',
+        command: 'food/product/create',
         data: {
           name: { value: 'product-1 ' },
         },

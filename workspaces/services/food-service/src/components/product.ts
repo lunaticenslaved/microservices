@@ -125,7 +125,7 @@ export type CreateRequest = z.infer<typeof CreateSchema>;
 export const CreateSchema = z.object({
   userId: Domain.Food.ProductSchema.shape.userId,
   nutrientsId: Domain.Food.ProductSchema.shape.nutrientsId,
-  name: ServiceUtils.stringUpdate.schema(Domain.Food.ProductSchema.shape.name),
+  name: ServiceUtils.stringCreate.schema(Domain.Food.ProductSchema.shape.name),
 });
 export async function create(
   arg: CreateRequest,

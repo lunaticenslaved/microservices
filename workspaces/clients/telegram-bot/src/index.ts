@@ -9,8 +9,9 @@ const PORT = 5001;
 
 const app = express();
 
-const Endpoints = {
+const Endpoints: Record<Gateway.Services, string> = {
   food: 'http://localhost:4002',
+  tag: '',
 };
 
 app.use(express.json());
@@ -34,7 +35,7 @@ app.post('/message', async (req, res) => {
 
     res.status(result.status).send(result).json().end();
   } else {
-    const result = await command(validatedBody.data.service)(validatedBody.data);
+    const result = await command(validatedBody.data)(validatedBody.data);
 
     if (!result.success) {
       console.error('[TELEGRAM BOT] [COMMAND ERROR]', JSON.stringify(result, null, 2));
@@ -51,7 +52,8 @@ app.listen(PORT, () => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function command(service: Gateway.IRequest<any, any>['service']) {
+function command(request: Gateway.IRequest<any, any>) {
+  const service = request.command.split('/')[0] as Gateway.Services;
   return async <
     TReq extends Gateway.IRequest<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
     TRes extends Gateway.IResponse<any>, // eslint-disable-line @typescript-eslint/no-explicit-any

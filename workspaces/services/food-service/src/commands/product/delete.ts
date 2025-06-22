@@ -8,7 +8,7 @@ export default App.addCommand<
   Gateway.Food.Product.DeleteRequest,
   Gateway.Food.Product.DeleteResponse,
   Gateway.Food.Product.DeleteExceptions
->('product/delete', {
+>('food/product/delete', {
   validator: z.object({
     id: Components.Product.DeleteOneSchema.shape.id,
   }),
