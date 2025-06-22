@@ -4,11 +4,7 @@ import z from 'zod/v4';
 import { Gateway } from '@libs/gateway';
 import { Database } from '#/db';
 
-App.addCommand<
-  Gateway.Food.Product.UpdateRequest,
-  Gateway.Food.Product.UpdateResponse,
-  Gateway.Food.Product.UpdateExceptions
->('food/product/update', {
+App.addCommand<Gateway.Food.Product.UpdateCommand>('food/product/update', {
   handler: async ({ data }, { user }) => {
     return await Database.prisma.$noThrowTransaction(async trx => {
       const product = await Components.Product.findFirst(

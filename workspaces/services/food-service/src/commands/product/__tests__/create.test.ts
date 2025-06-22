@@ -4,9 +4,11 @@ import createAction from '../create';
 import { createTestCommandContext } from '#/utils-test';
 import { Database } from '#/db';
 
+type CreateCommand = Gateway.Food.Product.CreateCommand;
+
 describe('validator is valid', () => {
   test('name is trimmed', () => {
-    const request: Gateway.Food.Product.CreateRequest['data'] = {
+    const request: CreateCommand['request']['data'] = {
       name: { value: ' name ' },
       nutrients: {
         calories: { value: 0 },
@@ -27,7 +29,7 @@ describe('validator is valid', () => {
 
 describe('can create product', () => {
   let productId: string;
-  let result: Gateway.Food.Product.CreateResponse | Gateway.Food.Product.CreateExceptions;
+  let result: CreateCommand['response'] | CreateCommand['exceptions'];
 
   beforeAll(async () => {
     result = await createAction.handler(

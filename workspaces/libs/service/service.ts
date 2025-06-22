@@ -12,17 +12,16 @@ const USER_ID = '23800be6-0aca-4d35-8ba6-8daa70e53ea2';
 // import cors from 'cors';
 // const CORS_ORIGIN_WHITELIST: string[] = [];
 
-type Command = `${Gateway.Services}/${string}`;
-
 type CommandConfig<
-  TReq extends Gateway.IRequest<Command, unknown>,
-  TRes extends Gateway.IResponse<unknown>,
-  TErr extends Gateway.IException<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+  TCommand extends Gateway.Command<any, any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
   ICommandContext,
 > = {
-  validator: z.ZodType<TReq['data']>;
-  handler: (data: TReq, context: ICommandContext) => Promise<TRes | TErr>;
-  command: TReq['command'];
+  validator: z.ZodType<TCommand['request']['data']>;
+  handler: (
+    data: TCommand['request'],
+    context: ICommandContext,
+  ) => Promise<TCommand['response'] | TCommand['exceptions']>;
+  command: TCommand['request']['command'];
 };
 
 export class Service<TConfig extends ServiceConfig, TCommandContext> {
@@ -36,30 +35,23 @@ export class Service<TConfig extends ServiceConfig, TCommandContext> {
 
   private commands: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-  addCommand<
-    TReq extends Gateway.IRequest<Command, unknown>,
-    TRes extends Gateway.IResponse<unknown>,
-    TErr extends Gateway.Exception<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
-  >(
-    command: TReq['command'],
-    arg: Omit<CommandConfig<TReq, TRes, TErr, TCommandContext>, 'command'>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addCommand<TCommand extends Gateway.Command<any, any, any>>(
+    command: TCommand['request']['command'],
+    arg: Omit<CommandConfig<TCommand, TCommandContext>, 'command'>,
   ) {
     this.commands[command] = {
       ...arg,
       command,
     };
 
-    return this.commands[command] as CommandConfig<TReq, TRes, TErr, TCommandContext>;
+    return this.commands[command] as CommandConfig<TCommand, TCommandContext>;
   }
 
-  findCommand(action: string):
-    | CommandConfig<
-        any, // eslint-disable-line @typescript-eslint/no-explicit-any
-        Gateway.IResponse<unknown>,
-        Gateway.IException<any, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
-        TCommandContext
-      >
-    | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  findCommand<TCommand extends Gateway.Command<any, any, any>>(
+    action: string,
+  ): CommandConfig<TCommand, TCommandContext> | undefined {
     return this.commands[action];
   }
 

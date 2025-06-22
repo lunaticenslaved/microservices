@@ -2,6 +2,7 @@ import { Domain } from '@libs/domain';
 import { Gateway } from '../..';
 
 import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from '../../common';
+import { Command } from '../../Command';
 
 export namespace Product {
   // DTOs ----------------------------------------------------------------------------------
@@ -39,9 +40,9 @@ export namespace Product {
 
   // Commands
   // CREATE --------------------------------------------------------------------------------
-  export type CreateExceptions = NameNotUniqueException | Gateway.CommonExceptions;
-  export type CreateResponse = Gateway.IResponse<DTO>;
-  export type CreateRequest = Gateway.IRequest<
+  type CreateExceptions = NameNotUniqueException | Gateway.CommonExceptions;
+  type CreateResponse = Gateway.IResponse<DTO>;
+  type CreateRequest = Gateway.IRequest<
     'food/product/create',
     {
       name: StringCreate;
@@ -54,14 +55,15 @@ export namespace Product {
       };
     }
   >;
+  export type CreateCommand = Command<CreateRequest, CreateResponse, CreateExceptions>;
 
   // UPDATE --------------------------------------------------------------------------------
-  export type UpdateExceptions =
+  type UpdateExceptions =
     | NotFoundException
     | NameNotUniqueException
     | Gateway.CommonExceptions;
-  export type UpdateResponse = Gateway.IResponse<DTO>;
-  export type UpdateRequest = Gateway.IRequest<
+  type UpdateResponse = Gateway.IResponse<DTO>;
+  type UpdateRequest = Gateway.IRequest<
     'food/product/update',
     {
       id: string;
@@ -75,22 +77,31 @@ export namespace Product {
       };
     }
   >;
+  export type UpdateCommand = Command<UpdateRequest, UpdateResponse, UpdateExceptions>;
 
   // DELETE --------------------------------------------------------------------------------
-  export type DeleteExceptions = NotFoundException | Gateway.CommonExceptions;
-  export type DeleteResponse = Gateway.IResponse<void>;
-  export type DeleteRequest = Gateway.IRequest<'food/product/delete', { id: string }>;
+  type DeleteExceptions = NotFoundException | Gateway.CommonExceptions;
+  type DeleteResponse = Gateway.IResponse<void>;
+  type DeleteRequest = Gateway.IRequest<'food/product/delete', { id: string }>;
+  export type DeleteCommand = Command<DeleteRequest, DeleteResponse, DeleteExceptions>;
 
   // FIND FIRST ----------------------------------------------------------------------------
-  export type FindFirstExceptions = Gateway.CommonExceptions;
-  export type FindFirstResponse = Gateway.IResponse<DTO | null>;
-  export type FindFirstRequest = Gateway.IRequest<
-    'food/product/find-first',
-    { id: string }
+  type FindFirstExceptions = Gateway.CommonExceptions;
+  type FindFirstResponse = Gateway.IResponse<DTO | null>;
+  type FindFirstRequest = Gateway.IRequest<'food/product/find-first', { id: string }>;
+  export type FindFirstCommand = Command<
+    FindFirstRequest,
+    FindFirstResponse,
+    FindFirstExceptions
   >;
 
   // FIND MANY -----------------------------------------------------------------------------
-  export type FindManyExceptions = Gateway.CommonExceptions;
-  export type FindManyRequest = Gateway.IRequest<'food/product/find-many', unknown>;
-  export type FindManyResponse = Gateway.IResponse<{ items: DTO[] }>;
+  type FindManyExceptions = Gateway.CommonExceptions;
+  type FindManyRequest = Gateway.IRequest<'food/product/find-many', unknown>;
+  type FindManyResponse = Gateway.IResponse<{ items: DTO[] }>;
+  export type FindManyCommand = Command<
+    FindManyRequest,
+    FindManyResponse,
+    FindManyExceptions
+  >;
 }

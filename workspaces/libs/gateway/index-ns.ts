@@ -4,10 +4,11 @@ import { createException, IException } from './Exception';
 export { type IException, Exception, createException } from './Exception';
 export { type IRequest, RequestSchema, getServiceFromRequest } from './Request';
 export { type IResponse, createResponse } from './Response';
-export { Services } from './services';
+export { type Command } from './Command';
 
 // Services
-export * as Food from './services/food';
+export { Services } from './services';
+export * as Food from './services/food-service';
 // export * as Tag from './services/tag';
 
 // COMMON EXCEPTIONS -------------------------------------------------------------------------

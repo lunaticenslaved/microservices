@@ -4,11 +4,7 @@ import z from 'zod/v4';
 import { Gateway } from '@libs/gateway';
 import { Database } from '#/db';
 
-export default App.addCommand<
-  Gateway.Food.Product.CreateRequest,
-  Gateway.Food.Product.CreateResponse,
-  Gateway.Food.Product.CreateExceptions
->('food/product/create', {
+export default App.addCommand<Gateway.Food.Product.CreateCommand>('food/product/create', {
   validator: z.object({
     name: Components.Product.CreateSchema.shape.name,
     nutrients: Components.Nutrients.CreateSchema,

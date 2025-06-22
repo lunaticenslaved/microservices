@@ -5,29 +5,28 @@ import { Gateway } from '@libs/gateway';
 import { nonReachable } from '#/utils';
 import { Database } from '#/db';
 
-export default App.addCommand<
-  Gateway.Food.Product.FindManyRequest,
-  Gateway.Food.Product.FindManyResponse,
-  Gateway.Food.Product.FindManyExceptions
->('food/product/find-many', {
-  validator: z.unknown(),
-  handler: async (_, { user }) => {
-    return Database.prisma.$noThrowTransaction(async trx => {
-      const listResult = await Components.Product.findMany_DTO(
-        { userId: user.id },
-        { trx },
-      );
+export default App.addCommand<Gateway.Food.Product.FindManyCommand>(
+  'food/product/find-many',
+  {
+    validator: z.unknown(),
+    handler: async (_, { user }) => {
+      return Database.prisma.$noThrowTransaction(async trx => {
+        const listResult = await Components.Product.findMany_DTO(
+          { userId: user.id },
+          { trx },
+        );
 
-      if (!listResult.success) {
-        nonReachable(listResult.success);
-      }
+        if (!listResult.success) {
+          nonReachable(listResult.success);
+        }
 
-      return Gateway.createResponse({
-        status: 200,
-        data: {
-          items: listResult.data,
-        },
+        return Gateway.createResponse({
+          status: 200,
+          data: {
+            items: listResult.data,
+          },
+        });
       });
-    });
+    },
   },
-});
+);
