@@ -24,12 +24,16 @@ type CommandConfig<
   command: TCommand['request']['command'];
 };
 
+type ServiceConstructor<TConfig> = {
+  config: TConfig;
+};
+
 export class Service<TConfig extends ServiceConfig, TCommandContext> {
   started = false;
 
   config: TConfig;
 
-  constructor(arg: { config: TConfig }) {
+  constructor(arg: ServiceConstructor<TConfig>) {
     this.config = arg.config;
   }
 
@@ -157,7 +161,7 @@ export class Service<TConfig extends ServiceConfig, TCommandContext> {
 
     expressServer.listen(port, () => {
       this.started = true;
-      console.log(`[${serviceTitle}] Up and running on port ${port}!`);
+      console.log(`[${serviceTitle}] Up and running on ${port}!`);
     });
   }
 }

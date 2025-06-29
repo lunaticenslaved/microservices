@@ -5,7 +5,7 @@ import 'dotenv/config';
 import path from 'path';
 
 App.start({
-  port: Number(process.env.PORT), // TODO Check in app
+  port: 3000,
   commandsDirPath: path.resolve(__dirname, 'commands'),
   createCommandContext: arg => ({
     ...arg,

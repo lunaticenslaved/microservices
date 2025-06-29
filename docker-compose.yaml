@@ -1,36 +1,104 @@
-# Create a docker-compose.yml file
-version: '3'
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:7.3.0
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_TICK_TIME: 2000
+  #   ports:
+  #     - "2181:2181"
 
-  kafka:
-    image: confluentinc/cp-kafka:7.3.0
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  # kafka:
+  #   image: confluentinc/cp-kafka:7.3.0
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui
-    container_name: kafka-ui
+  # kafka-ui:
+  #   image: provectuslabs/kafka-ui
+  #   container_name: kafka-ui
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     KAFKA_CLUSTERS_0_NAME: local
+  #     KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+  #     KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+  #   depends_on:
+  #     - kafka
+
+  gateway:
+    build:
+      context: .
+      dockerfile: workspaces/services/gateway/Dockerfile.dev
+    volumes:
+      - ./workspaces/services/gateway:/app/workspaces/services/gateway:rw
+      - ./node_modules/:/app/node_modules
     ports:
-      - "8080:8080"
+      - "4000:3000"
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      - APP_ENV=${APP_ENV}
+      - ENDPOINT__FOOD_SERVICE=http://food-service:3000
+      - ENDPOINT__TAG_SERVICE=http://tag-service:3000
     depends_on:
-      - kafka
+      - tag-service
+      - food-service
+  
+  tag-service:
+    build:
+      context: .
+      dockerfile: workspaces/services/tag-service/Dockerfile.dev
+    volumes:
+      - ./workspaces/services/tag-service:/app/workspaces/services/tag-service:rw
+      - ./node_modules/:/app/node_modules
+    environment:
+      - APP_ENV=${APP_ENV}
+      - DATABASE_URL=postgres://user:password@postgres:5432/tag
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  food-service:
+    build:
+      context: .
+      dockerfile: workspaces/services/food-service/Dockerfile.dev
+    volumes:
+      - ./workspaces/services/food-service:/app/workspaces/services/food-service:rw
+      - ./node_modules/:/app/node_modules
+    environment:
+      - APP_ENV=${APP_ENV}
+      - DATABASE_URL=postgres://user:password@postgres:5432/food
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    volumes:
+      - ./utils/initdb.sh:/docker-entrypoint-initdb.d/initdb.sh  # Initialization script
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: "food,tag"  # Your database names
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "6432:5432"  # Expose to host if you want to connect from local tools
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d food"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data: 
+    driver: local
+    driver_opts:
+      type: none
+      device: ./postgres-data
+      o: bind

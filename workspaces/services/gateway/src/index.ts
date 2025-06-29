@@ -5,7 +5,8 @@ import { Endpoints } from './endpoints';
 import { AxiosError, AxiosResponse } from 'axios';
 import { IncomingHttpHeaders } from 'http';
 
-const PORT = Number(process.env.PORT);
+const PORT = 3000;
+
 const REQUEST_HEADERS_TO_FORWARD = [
   'authorization',
   'content-type',
@@ -25,8 +26,11 @@ const server = express();
 server.use(express.json());
 
 server.post('/command', async (expressReq, expressRes) => {
+  console.log('[GATEWAY] [COMMAND] Received');
+
   // TODO add logs
 
+  console.log('[GATEWAY] [COMMAND] Trying to parse request');
   const result = Gateway.RequestSchema.safeParse(expressReq.body);
 
   if (!result.success) {
@@ -34,13 +38,24 @@ server.post('/command', async (expressReq, expressRes) => {
       issues: result.error.issues,
     });
 
+    console.error('[GATEWAY] [COMMAND] Error while parsing');
+
     expressRes.status(exception.status).json(exception);
   } else {
+    console.log(
+      '[GATEWAY] [COMMAND] Success parsing',
+      JSON.stringify(result.data, null, 2),
+    );
+
     const service = Gateway.getServiceFromRequest(result.data);
 
     expressRes.setHeader('x-service', service);
 
     try {
+      console.log(
+        `[GATEWAY] [COMMAND] Trying to connect '${service}' service on ${Endpoints[service]}`,
+      );
+
       const axiosRes = await axiosInstance.post(
         `${Endpoints[service]}/command`,
         result.data,
@@ -53,6 +68,8 @@ server.post('/command', async (expressReq, expressRes) => {
 
       expressRes.status(axiosRes.status).json(axiosRes.data);
     } catch (e) {
+      console.error(`[GATEWAY] [COMMAND] Error while connecting '${service}' service`);
+
       const axiosErr = e as AxiosError;
 
       if (axiosErr.response) {
@@ -71,7 +88,7 @@ server.post('/command', async (expressReq, expressRes) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`[GATEWAY] Up and listening on port ${PORT}!`);
+  console.log(`[GATEWAY] Up and listening on ${PORT}!`);
 });
 
 function forwardRequestHeaders(

@@ -1,2 +1,2 @@
-make test
-make lint-fix
+npm run test
+npm run lint:fix

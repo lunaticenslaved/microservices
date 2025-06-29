@@ -6,7 +6,7 @@ import { App } from '#/app';
 import { Database } from '#/db';
 
 App.start({
-  port: Number(process.env.PORT), // TODO Check in app
+  port: 3000,
   commandsDirPath: path.resolve(__dirname, 'commands'),
   createCommandContext: arg => ({
     ...arg,
