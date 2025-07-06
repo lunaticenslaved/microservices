@@ -94,12 +94,15 @@ server.post('/command', async (expressReq, expressRes) => {
 
         const axiosErr = e as AxiosError;
 
+        console.error(`[GATEWAY] [COMMAND] [ERROR]`, axiosErr.message);
+
         // The microservice responded with an error
         if (axiosErr.response) {
           // TODO check and parse exception
 
           forwardResponseHeaders(axiosErr.response, expressRes);
-          expressRes.status(axiosErr.response.status).send(axiosErr.response.data);
+
+          expressRes.status(axiosErr.response.status).json(axiosErr.response.data);
         }
 
         // The request was made but no response received

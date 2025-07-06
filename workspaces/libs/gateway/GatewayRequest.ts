@@ -20,13 +20,15 @@ export const GatewayRequestSchema = z.object({
   data: z.any(),
 });
 
-export interface IGatewayRequest<T extends ServiceCommandConfig['command']> {
+export interface IGatewayRequest<
+  T extends ServiceCommandConfig['command'] = ServiceCommandConfig['command'],
+> {
   command: `${Service}/${string}`;
   data: ExtractCommandContract<T>['request']['data'];
 }
 
-export class Gateway {
-  static request<T extends ServiceCommandConfig['command']>(arg: IGatewayRequest<T>) {
-    return arg;
-  }
-}
+// export class Gateway {
+//   static request<T extends ServiceCommandConfig['command']>(arg: IGatewayRequest<T>) {
+//     return arg;
+//   }
+// }

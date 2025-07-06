@@ -33,6 +33,21 @@ services:
   #   depends_on:
   #     - kafka
 
+  telegram-bot: 
+    build:
+      context: .
+      dockerfile: workspaces/clients/telegram-bot/Dockerfile.dev
+    volumes:
+      - ./workspaces/clients/telegram-bot:/app/workspaces/clients/telegram-bot:rw
+      - ./node_modules/:/app/node_modules
+    ports:
+      - "4001:3000"
+    environment:
+      - APP_ENV=${APP_ENV}
+      - GATEWAY_ENDPOINT=http://gateway:3000
+    depends_on:
+      - gateway
+
   gateway:
     build:
       context: .
@@ -97,8 +112,8 @@ services:
 
 volumes:
   postgres_data: 
-    driver: local
-    driver_opts:
-      type: none
-      device: ./postgres-data
-      o: bind
+    # driver: local
+    # driver_opts:
+    #   type: none
+    #   device: ./postgres-data
+    #   o: bind

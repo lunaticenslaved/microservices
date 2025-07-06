@@ -119,16 +119,20 @@ export class Application<TConfig extends ServiceConfig, TCommandContext> {
 
         const requestContext = arg.createCommandContext({ serviceConfig: this.config });
 
+        console.log(`[${serviceTitle}] [COMMAND] Config found`);
         const commandConfig = this.findCommandConfigOfThrow(req.body?.command);
 
         // Если Gateway пропустил сюда, то структура запроса уже валидна
         const commandRequest = req.body as ICommandRequest<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
         const { error } = commandConfig.validator.safeParse(commandRequest.data);
 
+        console.log(`[${serviceTitle}] [COMMAND] Request validated`, !error);
+
         if (error) {
           throw new RequestValidationException({ issues: error.issues });
         }
 
+        console.log(`[${serviceTitle}] [COMMAND] Handling command...`);
         const response = await commandConfig.handler(commandRequest, requestContext);
 
         res.status(response.status).json(response);

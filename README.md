@@ -8,6 +8,9 @@ mkdir postgres-data  # Create the directory first
 docker-compose up -d postgres
 sudo chown -R 999:999 postgres-data  # 999 is usually Postgres' user in container
 
+or assign it to user user:
+sudo chown -R $USER:$USER /path/to/folder
+
 # How to connect to postgres container with psql
 psql -h localhost -p 6432 -U user -d tag
 
@@ -20,3 +23,4 @@ DATABASE_URL=postgres://user:password@localhost:6432/$SERVICE \
     --schema workspaces/services/$SERVICE-service/prisma/schema.prisma
 
 ```
+sudo chown -R 999:999 ./postgres_data
