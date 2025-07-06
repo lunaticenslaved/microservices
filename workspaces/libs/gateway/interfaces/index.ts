@@ -6,7 +6,7 @@ export { type ICommandContract } from './CommandContract';
 export { type ICommandRequest } from './CommandRequest';
 export { type ICommandResponse } from './CommandResponse';
 
-export { ServiceContract, type GetServiceContractCommands } from './ServiceContract';
+export { ServiceContract } from './ServiceContract';
 
 export { GatewayRequestSchema, type IGatewayRequest } from '../GatewayRequest';
 

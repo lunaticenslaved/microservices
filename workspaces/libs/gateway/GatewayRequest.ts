@@ -1,7 +1,10 @@
 import z from 'zod/v4';
 
-import { FoodService, Service } from './service-contracts';
-import { GetServiceContractCommands } from './interfaces';
+import {
+  ServiceCommandConfig,
+  Service,
+  ExtractCommandContract,
+} from './service-contracts';
 
 export const GatewayRequestSchema = z.object({
   command: z.custom<`${Service}/${string}`>(
@@ -17,21 +20,13 @@ export const GatewayRequestSchema = z.object({
   data: z.any(),
 });
 
-export interface IGatewayRequest<T extends ServicesCommands['command']> {
+export interface IGatewayRequest<T extends ServiceCommandConfig['command']> {
   command: `${Service}/${string}`;
-  data: CommandContract<T>['request']['data'];
+  data: ExtractCommandContract<T>['request']['data'];
 }
 
-type Services = typeof FoodService.Contract;
-type ServicesCommands = GetServiceContractCommands<Services>;
-
-type CommandContract<T extends ServicesCommands['command']> = Extract<
-  ServicesCommands,
-  { command: T }
->;
-
 export class Gateway {
-  static request<T extends ServicesCommands['command']>(arg: IGatewayRequest<T>) {
+  static request<T extends ServiceCommandConfig['command']>(arg: IGatewayRequest<T>) {
     return arg;
   }
 }

@@ -1,6 +1,5 @@
-import { App } from '#/app';
-import { Database } from '#/db';
-import 'dotenv/config';
+import { App } from './app';
+import { Database } from './db';
 
 import path from 'path';
 

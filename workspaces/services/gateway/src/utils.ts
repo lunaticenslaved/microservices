@@ -1,4 +1,4 @@
-import { IGatewayRequest, ServiceContracts } from '@libs/gateway';
+import { IGatewayRequest, ServiceCommandConfig, ServiceContracts } from '@libs/gateway';
 import { Service, ServiceContract } from '@libs/gateway';
 
 import { IncomingHttpHeaders } from 'http';
@@ -27,8 +27,10 @@ export function getServiceFromRequest(req: IGatewayRequest<any>): Service {
   return service;
 }
 
-export function getServiceContract(service: Service): ServiceContract {
-  return ServiceContracts[service];
+export function getServiceContract(
+  service: Service,
+): ServiceContract<ServiceCommandConfig> {
+  return ServiceContracts[service] as ServiceContract<ServiceCommandConfig>;
 }
 
 export function forwardRequestHeaders(

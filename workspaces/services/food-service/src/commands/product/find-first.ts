@@ -2,9 +2,9 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { FoodService, SuccessResponse } from '@libs/gateway';
+import { FoodProduct, SuccessResponse } from '@libs/gateway';
 
-export default App.addCommand<FoodService.Product.FindFirstCommand>({
+export default App.addCommand({
   command: 'food/product/find-first',
   validator: z.object({
     id: Components.Product.DeleteOneSchema.shape.id,
@@ -17,7 +17,7 @@ export default App.addCommand<FoodService.Product.FindFirstCommand>({
       );
 
       if (!found) {
-        return new FoodService.Product.NotFoundException(data);
+        return new FoodProduct.NotFoundException(data);
       }
 
       return new SuccessResponse({

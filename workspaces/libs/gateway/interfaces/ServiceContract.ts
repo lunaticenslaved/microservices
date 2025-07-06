@@ -1,27 +1,31 @@
+import { ExtractCommandContract, ServiceCommandConfig } from '../service-contracts';
+
 import { ICommandContract } from './CommandContract';
 
-type SavedConfig = {
-  command: ICommandContract['command'];
+type SavedConfig<T extends ICommandContract> = {
   request: {
-    enrichments: ICommandContract['request']['enrichments'];
+    enrichments: T['request']['enrichments'];
   };
 };
 
-export class ServiceContract<TCommands extends ICommandContract = ICommandContract> {
-  private commands: Record<string, SavedConfig> = {};
+type CommandMap<T extends ServiceCommandConfig> = {
+  [K in T['command']]: SavedConfig<ExtractCommandContract<K>>;
+};
 
-  createCommand<TCommand extends TCommands>(
-    config: Pick<TCommand, 'command'> & {
-      request: { enrichments: TCommand['request']['enrichments'] };
-    },
-  ) {
-    this.commands[config.command] = config;
+export class ServiceContract<T extends ServiceCommandConfig> {
+  private commands: CommandMap<T>;
+
+  constructor(commands: CommandMap<T>) {
+    this.commands = commands;
   }
 
-  findCommand(command: string): SavedConfig | undefined {
-    return this.commands[command];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  findCommand(command: string): SavedConfig<any> | undefined {
+    if (command in this.commands) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return this.commands[command as keyof typeof this.commands] as SavedConfig<any>;
+    }
+
+    return undefined;
   }
 }
-
-export type GetServiceContractCommands<T> =
-  T extends ServiceContract<infer U> ? U : never;

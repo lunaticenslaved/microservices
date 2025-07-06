@@ -2,9 +2,9 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { SuccessResponse, FoodService } from '@libs/gateway';
+import { SuccessResponse } from '@libs/gateway';
 
-export default App.addCommand<FoodService.Product.CreateCommand>({
+export default App.addCommand({
   command: 'food/product/create',
   validator: z.object({
     name: Components.Product.CreateSchema.shape.name,

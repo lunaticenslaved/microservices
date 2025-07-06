@@ -3,9 +3,9 @@ import { Components } from '#/components';
 import z from 'zod/v4';
 import { nonReachable } from '#/utils';
 import { Database } from '#/db';
-import { FoodService, SuccessResponse } from '@libs/gateway';
+import { SuccessResponse } from '@libs/gateway';
 
-export default App.addCommand<FoodService.Product.FindManyCommand>({
+export default App.addCommand({
   command: 'food/product/find-many',
   validator: z.any(),
   handler: async ({ enrichments: { user } }) => {

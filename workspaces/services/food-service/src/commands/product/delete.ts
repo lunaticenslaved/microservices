@@ -2,9 +2,9 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { FoodService, SuccessResponse } from '@libs/gateway';
+import { FoodProduct, SuccessResponse } from '@libs/gateway';
 
-export default App.addCommand<FoodService.Product.DeleteCommand>({
+export default App.addCommand({
   command: 'food/product/delete',
   validator: z.object({
     id: Components.Product.DeleteOneSchema.shape.id,
@@ -20,7 +20,7 @@ export default App.addCommand<FoodService.Product.DeleteCommand>({
       );
 
       if (!found) {
-        return new FoodService.Product.NotFoundException({ id: data.id });
+        return new FoodProduct.NotFoundException({ id: data.id });
       }
 
       const deleteResult = await Components.Product.deleteOne(

@@ -1,10 +1,10 @@
 // import { App } from '#/app';
 // import z from 'zod/v4';
 // import { Database } from '#/db';
-// import { SuccessResponse, TagService } from '@libs/gateway';
+// import { SuccessResponse } from '@libs/gateway';
 
-// export default App.addCommand<TagService.UniqueKey.CreateCommand>({
-//   command: 'food/product/create',
+// export default App.addCommand({
+//   command: 'tag/unique-key/create',
 //   validator: z.object({
 //     name: Components.Product.CreateSchema.shape.name,
 //     nutrients: Components.Nutrients.CreateSchema,

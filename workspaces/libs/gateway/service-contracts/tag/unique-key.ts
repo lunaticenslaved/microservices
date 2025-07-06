@@ -1,4 +1,4 @@
-import { StringUpdate } from '@libs/common';
+import { StringCreate } from '@libs/common';
 
 import { ICommandContract, Exception } from '../../interfaces';
 
@@ -30,10 +30,9 @@ export type CreateCommand = ICommandContract<{
   command: 'tag/unique-key/create';
   request: {
     data: {
-      key: StringUpdate;
-      service: 'food';
       itemType: 'product';
-      itemId: StringUpdate;
+      key: StringCreate;
+      itemId: string;
     };
     enrichments: {
       user: true;

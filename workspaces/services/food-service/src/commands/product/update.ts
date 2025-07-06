@@ -2,9 +2,9 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { FoodService, SuccessResponse } from '@libs/gateway';
+import { FoodProduct, SuccessResponse } from '@libs/gateway';
 
-App.addCommand<FoodService.Product.UpdateCommand>({
+App.addCommand({
   command: 'food/product/update',
   handler: async ({ data, enrichments: { user } }) => {
     return await Database.prisma.$noThrowTransaction(async trx => {
@@ -14,7 +14,7 @@ App.addCommand<FoodService.Product.UpdateCommand>({
       );
 
       if (!product) {
-        return new FoodService.Product.NotFoundException({ id: data.id });
+        return new FoodProduct.NotFoundException({ id: data.id });
       }
 
       if (data.name) {

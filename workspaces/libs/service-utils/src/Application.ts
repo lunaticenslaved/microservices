@@ -9,11 +9,10 @@ import {
   RequestValidationException,
   UnknownCommandException,
   UnknownException,
-  ICommandContract,
   ICommandRequest,
-  ServiceContract,
   SuccessResponse,
-  GetServiceContractCommands,
+  ServiceCommandConfig,
+  ExtractCommandContract,
 } from '@libs/gateway';
 
 import { ServiceConfig } from './types';
@@ -21,54 +20,48 @@ import { ServiceConfig } from './types';
 // import cors from 'cors';
 // const CORS_ORIGIN_WHITELIST: string[] = [];
 
-type ServiceCommandConfig<TContract extends ICommandContract, TContext> = {
-  command: TContract['command'];
-  validator: z.ZodType<TContract['request']['data']>;
+type ApplicationCommandConfig<T extends ServiceCommandConfig['command'], TContext> = {
+  command: T;
+  validator: z.ZodType<ExtractCommandContract<T>['request']['data']>;
   handler: (
-    request: ICommandRequest<TContract>,
+    request: ICommandRequest<ExtractCommandContract<T>>,
     context: TContext,
-  ) => Promise<SuccessResponse<TContract['response']['data']> | TContract['exceptions']>;
+  ) => Promise<
+    | SuccessResponse<ExtractCommandContract<T>['response']['data']>
+    | ExtractCommandContract<T>['exceptions']
+  >;
 };
 
-type ApplicationConstructor<TConfig, TContract> = {
+type ApplicationConstructor<TConfig> = {
   config: TConfig;
-  contract: TContract;
 };
 
-export class Application<
-  TConfig extends ServiceConfig,
-  TCommandContext,
-  TContract extends ServiceContract,
-> {
+export class Application<TConfig extends ServiceConfig, TCommandContext> {
   started = false;
 
   config: TConfig;
-  contract: TContract;
 
-  constructor(arg: ApplicationConstructor<TConfig, TContract>) {
+  constructor(arg: ApplicationConstructor<TConfig>) {
     this.config = arg.config;
-    this.contract = arg.contract;
   }
 
   private commands: Record<
     string,
-    ServiceCommandConfig<GetServiceContractCommands<TContract>, TCommandContext>
+    ApplicationCommandConfig<ServiceCommandConfig['command'], TCommandContext>
   > = {};
 
-  addCommand<TCommand extends GetServiceContractCommands<TContract>>(
-    config: ServiceCommandConfig<TCommand, TCommandContext>,
+  addCommand<T extends ServiceCommandConfig['command']>(
+    config: ApplicationCommandConfig<T, TCommandContext>,
   ) {
-    this.commands[config.command] = config as unknown as ServiceCommandConfig<
-      GetServiceContractCommands<TContract>,
-      TCommandContext
-    >;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.commands[config.command] = config as any;
 
     return config;
   }
 
   findCommandConfigOfThrow(command: string) {
-    const commandConfig = this.commands[command] as
-      | ServiceCommandConfig<GetServiceContractCommands<TContract>, TCommandContext>
+    const commandConfig = this.commands[command] as unknown as
+      | ApplicationCommandConfig<ServiceCommandConfig['command'], TCommandContext>
       | undefined;
 
     if (!commandConfig) {

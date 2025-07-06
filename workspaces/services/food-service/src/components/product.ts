@@ -3,7 +3,7 @@ import { PrismaTransaction } from '#/db';
 import { FoodDomain } from '@libs/domain';
 import { ServiceUtils } from '@libs/service-utils';
 import { Result, ResultSuccess } from '@libs/common';
-import { FoodService, RequestValidationException } from '@libs/gateway';
+import { FoodProduct, RequestValidationException } from '@libs/gateway';
 
 const DTO_SELECT = {
   id: true,
@@ -53,7 +53,7 @@ export const FindFirstSchema = z.union([
 export async function findFirst_DTO(
   arg: FindFirstRequest,
   context: { trx: PrismaTransaction },
-): Promise<FoodService.Product.DTO | null> {
+): Promise<FoodProduct.DTO | null> {
   if ('id' in arg) {
     return await context.trx.product.findFirst({
       select: DTO_SELECT,
@@ -110,7 +110,7 @@ export const FindManySchema = z.object({
 export async function findMany_DTO(
   arg: FindManyRequest,
   context: { trx: PrismaTransaction },
-): Promise<ResultSuccess<FoodService.Product.DTO[]>> {
+): Promise<ResultSuccess<FoodProduct.DTO[]>> {
   const items = await context.trx.product.findMany({
     select: DTO_SELECT,
     where: {
@@ -131,13 +131,13 @@ export const CreateSchema = z.object({
 export async function create(
   arg: CreateRequest,
   context: { trx: PrismaTransaction },
-): Promise<Result<{ id: string }, FoodService.Product.NameNotUniqueException>> {
+): Promise<Result<{ id: string }, FoodProduct.NameNotUniqueException>> {
   const name = arg.name.value;
 
   const { unique } = await checkIfNameUnique({ name }, context);
 
   if (!unique) {
-    return Result.error(new FoodService.Product.NameNotUniqueException({ name }));
+    return Result.error(new FoodProduct.NameNotUniqueException({ name }));
   }
 
   const created = await context.trx.product.create({
@@ -164,7 +164,7 @@ export async function update(
   arg: UpdateRequest,
   context: { trx: PrismaTransaction },
 ): Promise<
-  Result<null, FoodService.Product.NameNotUniqueException | RequestValidationException>
+  Result<null, FoodProduct.NameNotUniqueException | RequestValidationException>
 > {
   const parsed = z.safeParse(UpdateSchema, arg);
 
@@ -176,7 +176,7 @@ export async function update(
   const name = arg.name.value;
   const { unique } = await checkIfNameUnique({ name }, context);
   if (!unique) {
-    return Result.error(new FoodService.Product.NameNotUniqueException({ name }));
+    return Result.error(new FoodProduct.NameNotUniqueException({ name }));
   }
 
   // Update product
@@ -201,11 +201,11 @@ export const DeleteOneSchema = z.object({
 export async function deleteOne(
   arg: DeleteOneRequest,
   context: { trx: PrismaTransaction },
-): Promise<Result<void, FoodService.Product.NotFoundException>> {
+): Promise<Result<void, FoodProduct.NotFoundException>> {
   const found = await findFirst(arg, context);
 
   if (!found) {
-    return Result.error(new FoodService.Product.NotFoundException(arg));
+    return Result.error(new FoodProduct.NotFoundException(arg));
   }
 
   return Result.success(undefined);

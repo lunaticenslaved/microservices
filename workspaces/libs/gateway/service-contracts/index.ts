@@ -1,7 +1,8 @@
-import * as FoodService from './food';
-import * as TagService from './tag';
+export * from './food';
+export * from './tag';
 
-export { FoodService, TagService };
+import { type FoodCommandConfig, FoodContract } from './food';
+import { type TagCommandConfig, TagContract } from './tag';
 
 export enum Service {
   Food = 'food',
@@ -9,6 +10,13 @@ export enum Service {
 }
 
 export const ServiceContracts = {
-  [Service.Food]: FoodService.Contract,
-  [Service.Tag]: TagService.Contract,
+  [Service.Food]: FoodContract,
+  [Service.Tag]: TagContract,
 };
+
+export type ServiceCommandConfig = FoodCommandConfig | TagCommandConfig;
+
+export type ExtractCommandContract<T extends ServiceCommandConfig['command']> = Extract<
+  ServiceCommandConfig,
+  { command: T }
+>;

@@ -1,9 +1,7 @@
-import 'dotenv/config';
-
 import path from 'path';
 
-import { App } from '#/app';
-import { Database } from '#/db';
+import { App } from './app';
+import { Database } from './db';
 
 App.start({
   port: 3000,

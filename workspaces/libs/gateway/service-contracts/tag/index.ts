@@ -1,18 +1,13 @@
 import { ServiceContract } from '../../interfaces/ServiceContract';
 
-import * as UniqueKey from './unique-key';
+import * as TagUniqueKey from './unique-key';
 
-export const Contract = new ServiceContract<Command>();
+export { TagUniqueKey };
 
-export { UniqueKey };
-
-type Command = UniqueKey.CreateCommand;
-
-Contract.createCommand<UniqueKey.CreateCommand>({
-  command: 'tag/unique-key/create',
-  request: {
-    enrichments: {
-      user: true,
-    },
+export const TagContract = new ServiceContract<TagCommandConfig>({
+  'tag/unique-key/create': {
+    request: { enrichments: { user: true } },
   },
 });
+
+export type TagCommandConfig = TagUniqueKey.CreateCommand;
