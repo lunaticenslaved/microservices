@@ -3,7 +3,6 @@ import 'dotenv/config';
 import express from 'express';
 import axios, { AxiosError } from 'axios';
 import YAML from 'yaml';
-import { Gateway } from '@libs/gateway';
 
 const PORT = 5001;
 
@@ -23,7 +22,7 @@ app.post('/message', async (req, res) => {
   const actionRequest = YAML.parse(message);
   console.log('[TELEGRAM BOT] Received message:', actionRequest);
 
-  const validatedBody = Gateway.RequestSchema.safeParse(actionRequest);
+  const validatedBody = GatewayRequestSchema.safeParse(actionRequest);
 
   if (!validatedBody.success) {
     const result: Gateway.RequestValidationException =

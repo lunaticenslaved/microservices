@@ -1,7 +1,5 @@
 import z from 'zod/v4';
-import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from '@libs/gateway';
-
-// TODO move it somewhere
+import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from '@libs/common';
 
 export const ServiceUtils = {
   numberCreate: {

@@ -1,16 +1,16 @@
 {
-  "name": "@libs/gateway",
+  "name": "@libs/common",
   "version": "1.0.0",
-  "description": "",
   "main": "index.ts",
   "scripts": {
     "typecheck": "tsc --project ./tsconfig.json --noEmit"
   },
   "author": "",
   "license": "ISC",
+  "description": "",
   "dependencies": {
-    "@libs/domain": "^1.0.0",
-    "@libs/common": "^1.0.0",
-    "zod": "^3.25.56"
+    "@libs/gateway": "^1.0.0",
+    "@prisma/client": "^6.10.1",
+    "express": "^5.1.0"
   }
 }

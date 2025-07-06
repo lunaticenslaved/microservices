@@ -1,43 +1,39 @@
 import { z } from 'zod/v4';
 import { PrismaTransaction } from '#/db';
-import { Gateway } from '@libs/gateway';
-import { ServiceUtils } from '@libs/service';
-import { Domain, Result, ResultSuccess } from '@libs/domain';
+import { FoodDomain } from '@libs/domain';
+import { ServiceUtils } from '@libs/service-utils';
+import { RequestValidationException } from '@libs/gateway';
+import { Result, ResultSuccess } from '@libs/common';
 
 // CREATE NUTRIENTS ------------------------------------------------------------------------
 export type CreateRequest = z.infer<typeof CreateSchema>;
 export const CreateSchema = z
   .object({
     calories: ServiceUtils.numberCreate
-      .schema(Domain.Food.NutrientsSchema.shape.calories)
+      .schema(FoodDomain.NutrientsSchema.shape.calories)
       .optional(),
     proteins: ServiceUtils.numberCreate
-      .schema(Domain.Food.NutrientsSchema.shape.proteins)
+      .schema(FoodDomain.NutrientsSchema.shape.proteins)
       .optional(),
     fats: ServiceUtils.numberCreate
-      .schema(Domain.Food.NutrientsSchema.shape.fats)
+      .schema(FoodDomain.NutrientsSchema.shape.fats)
       .optional(),
     carbs: ServiceUtils.numberCreate
-      .schema(Domain.Food.NutrientsSchema.shape.carbs)
+      .schema(FoodDomain.NutrientsSchema.shape.carbs)
       .optional(),
     fibers: ServiceUtils.numberCreate
-      .schema(Domain.Food.NutrientsSchema.shape.fibers)
+      .schema(FoodDomain.NutrientsSchema.shape.fibers)
       .optional(),
   })
   .optional();
 export async function create(
   data: CreateRequest,
   context: { trx: PrismaTransaction },
-): Promise<Result<{ id: string }, Gateway.RequestValidationException>> {
+): Promise<Result<{ id: string }, RequestValidationException>> {
   const parsed = z.safeParse(CreateSchema, data);
 
   if (!parsed.success) {
-    return {
-      success: false,
-      error: Gateway.createRequestValidationException({
-        issues: parsed.error.issues,
-      }),
-    };
+    return Result.error(new RequestValidationException({ issues: parsed.error.issues }));
   }
 
   const { id } = await context.trx.nutrients.create({
@@ -63,12 +59,7 @@ export async function create(
     },
   });
 
-  return {
-    success: true,
-    data: {
-      id,
-    },
-  };
+  return Result.success({ id });
 }
 
 // UPDATE NUTRIENTS ------------------------------------------------------------------------
@@ -76,33 +67,31 @@ export type UpdateRequest = z.infer<typeof UpdateSchema>;
 export const UpdateSchema = z.object({
   id: z.uuid(),
   calories: ServiceUtils.numberUpdate
-    .schema(Domain.Food.NutrientsSchema.shape.calories)
+    .schema(FoodDomain.NutrientsSchema.shape.calories)
     .optional(),
   proteins: ServiceUtils.numberUpdate
-    .schema(Domain.Food.NutrientsSchema.shape.proteins)
+    .schema(FoodDomain.NutrientsSchema.shape.proteins)
     .optional(),
   fats: ServiceUtils.numberUpdate
-    .schema(Domain.Food.NutrientsSchema.shape.fats)
+    .schema(FoodDomain.NutrientsSchema.shape.fats)
     .optional(),
   carbs: ServiceUtils.numberUpdate
-    .schema(Domain.Food.NutrientsSchema.shape.carbs)
+    .schema(FoodDomain.NutrientsSchema.shape.carbs)
     .optional(),
   fibers: ServiceUtils.numberUpdate
-    .schema(Domain.Food.NutrientsSchema.shape.fibers)
+    .schema(FoodDomain.NutrientsSchema.shape.fibers)
     .optional(),
 });
 export async function update(
   data: UpdateRequest,
   context: { trx: PrismaTransaction },
-): Promise<Result<void, Gateway.RequestValidationException>> {
+): Promise<Result<void, RequestValidationException>> {
   const parsed = z.safeParse(UpdateSchema, data);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: Gateway.createRequestValidationException({
-        issues: parsed.error.issues,
-      }),
+      error: new RequestValidationException({ issues: parsed.error.issues }),
     };
   }
 
@@ -132,7 +121,7 @@ export async function update(
 // DELETE MANY -----------------------------------------------------------------------------
 export type DeleteManyRequest = z.infer<typeof DeleteManySchema>;
 export const DeleteManySchema = z.object({
-  ids: z.array(Domain.Food.NutrientsSchema.shape.id),
+  ids: z.array(FoodDomain.NutrientsSchema.shape.id),
 });
 export async function deleteMany(
   arg: DeleteManyRequest,

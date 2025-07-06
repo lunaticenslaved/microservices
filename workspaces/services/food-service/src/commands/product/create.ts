@@ -1,15 +1,16 @@
 import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
-import { Gateway } from '@libs/gateway';
 import { Database } from '#/db';
+import { SuccessResponse, FoodService } from '@libs/gateway';
 
-export default App.addCommand<Gateway.Food.Product.CreateCommand>('food/product/create', {
+export default App.addCommand<FoodService.Product.CreateCommand>({
+  command: 'food/product/create',
   validator: z.object({
     name: Components.Product.CreateSchema.shape.name,
     nutrients: Components.Nutrients.CreateSchema,
   }),
-  handler: async ({ data }, { user }) => {
+  handler: async ({ data, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {
       const nutrientsResult = await Components.Nutrients.create(data.nutrients, {
         trx,
@@ -45,7 +46,7 @@ export default App.addCommand<Gateway.Food.Product.CreateCommand>('food/product/
         throw new Error('Product not found!');
       }
 
-      return Gateway.createResponse({
+      return new SuccessResponse({
         status: 201,
         data: created,
       });

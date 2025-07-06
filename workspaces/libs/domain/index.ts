@@ -1,2 +1,2 @@
-export * as Domain from './index-ns';
-export { Result, type ResultSuccess } from './utils.results';
+export * as FoodDomain from './food';
+export * as TagDomain from './tag';

@@ -5,7 +5,7 @@ export enum ItemType {
   FoodProduct = 'food/product',
 }
 
-export type Key = {
+export type UniqueKey = {
   id: string;
   userId: string;
   itemType: ItemType;
@@ -13,7 +13,7 @@ export type Key = {
   key: string;
 };
 
-export const KeySchema = z.object({
+export const UniqueKeySchema = z.object({
   id: z.uuid(),
   userId: z.uuid(),
   itemId: z.uuid(),
@@ -29,4 +29,4 @@ export const KeySchema = z.object({
       },
     )
     .max(255), // FIXME transform to slug
-}) satisfies z.ZodType<Key>;
+}) satisfies z.ZodType<UniqueKey>;

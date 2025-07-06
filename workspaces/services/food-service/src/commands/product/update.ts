@@ -1,11 +1,12 @@
 import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
-import { Gateway } from '@libs/gateway';
 import { Database } from '#/db';
+import { FoodService, SuccessResponse } from '@libs/gateway';
 
-App.addCommand<Gateway.Food.Product.UpdateCommand>('food/product/update', {
-  handler: async ({ data }, { user }) => {
+App.addCommand<FoodService.Product.UpdateCommand>({
+  command: 'food/product/update',
+  handler: async ({ data, enrichments: { user } }) => {
     return await Database.prisma.$noThrowTransaction(async trx => {
       const product = await Components.Product.findFirst(
         { id: data.id, userId: user.id },
@@ -13,7 +14,7 @@ App.addCommand<Gateway.Food.Product.UpdateCommand>('food/product/update', {
       );
 
       if (!product) {
-        return Gateway.Food.Product.createNotFoundException({ id: data.id });
+        return new FoodService.Product.NotFoundException({ id: data.id });
       }
 
       if (data.name) {
@@ -35,7 +36,7 @@ App.addCommand<Gateway.Food.Product.UpdateCommand>('food/product/update', {
         throw new Error('Product not found!');
       }
 
-      return Gateway.createResponse({
+      return new SuccessResponse({
         status: 200,
         data: updated,
       });

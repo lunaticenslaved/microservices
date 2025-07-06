@@ -1,5 +1,5 @@
 {
-  "name": "@libs/service",
+  "name": "@libs/service-utils",
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "@libs/gateway": "^1.0.0",
+    "@libs/common": "^1.0.0",
     "@prisma/client": "^6.10.1",
     "express": "^5.1.0"
   }

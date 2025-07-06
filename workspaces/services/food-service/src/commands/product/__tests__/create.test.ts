@@ -1,10 +1,11 @@
-import { Gateway } from '@libs/gateway';
-
-import createAction from '../create';
+import createCommand from '../create';
 import { createTestCommandContext } from '#/utils-test';
 import { Database } from '#/db';
+import { FoodService } from '@libs/gateway';
+import { UnwrapPromiseFnResult } from '@libs/common';
+import { randomUUID } from 'crypto';
 
-type CreateCommand = Gateway.Food.Product.CreateCommand;
+type CreateCommand = FoodService.Product.CreateCommand;
 
 describe('validator is valid', () => {
   test('name is trimmed', () => {
@@ -19,7 +20,7 @@ describe('validator is valid', () => {
       },
     };
 
-    const parsed = createAction.validator.safeParse(request);
+    const parsed = createCommand.validator.safeParse(request);
     expect(parsed.success).toBeTruthy();
 
     if (!parsed.success) return;
@@ -29,14 +30,19 @@ describe('validator is valid', () => {
 
 describe('can create product', () => {
   let productId: string;
-  let result: CreateCommand['response'] | CreateCommand['exceptions'];
+  let result: UnwrapPromiseFnResult<typeof createCommand.handler>;
 
   beforeAll(async () => {
-    result = await createAction.handler(
+    result = await createCommand.handler(
       {
         command: 'food/product/create',
         data: {
           name: { value: 'product-1 ' },
+        },
+        enrichments: {
+          user: {
+            id: randomUUID(),
+          },
         },
       },
       createTestCommandContext(),
@@ -52,7 +58,11 @@ describe('can create product', () => {
   });
 
   test('status is 201', () => {
-    expect(result.status).toBe(201);
+    if (result.success) {
+      expect(result.status).toBe(201);
+    } else {
+      throw new Error('Not valid');
+    }
   });
 
   test('product created', async () => {

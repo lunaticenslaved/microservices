@@ -1,24 +1,23 @@
 import { randomUUID } from 'crypto';
-import { Gateway } from '@libs/gateway';
-import { ItemType, Service } from '../db/generated';
+import { ItemType } from '../db/generated';
 import { Database } from './db-singleton';
+import { Exception } from '@libs/gateway';
 
 const data = {
   userId: randomUUID(),
-  service: Service.Food,
-  itemType: ItemType.Product,
+  itemType: ItemType.FoodProduct,
   itemId: randomUUID(),
-  tag: 'tag',
+  key: 'key',
 };
 
 test('test transaction rollback', async () => {
   const result = await Database.prisma.$noThrowTransaction(async trx => {
-    await trx.tag.create({
+    await trx.uniqueKey.create({
       data,
     });
 
     if (![].length) {
-      return Gateway.createException({
+      return new Exception({
         type: 'test',
         status: 400,
         message: 'Message',
@@ -29,9 +28,9 @@ test('test transaction rollback', async () => {
     return 1;
   });
 
-  expect(result).toBeInstanceOf(Gateway.Exception);
+  expect(result).toBeInstanceOf(Exception);
 
-  const product = await Database.prisma.tag.findFirst({
+  const product = await Database.prisma.uniqueKey.findFirst({
     where: data,
   });
 

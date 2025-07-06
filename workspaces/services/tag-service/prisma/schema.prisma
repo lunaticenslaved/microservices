@@ -15,22 +15,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Service {
-  Food
-}
-
 enum ItemType {
-  Product
+  FoodProduct @map("food/product")
 }
 
-model Tag {
+model UniqueKey {
   id       String   @id @default(uuid()) @db.Uuid
   userId   String   @map("user_id") @db.Uuid
-  service  Service
   itemType ItemType @map("item_type")
   itemId   String   @map("item_id") @db.Uuid
-  tag      String   @db.VarChar(255)
+  key      String   @db.VarChar(255)
 
-  @@unique([userId, tag])
-  @@map("tag")
+  @@unique([userId, key])
+  @@map("unique_keys")
 }

@@ -1,14 +1,15 @@
 import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
-import { Gateway } from '@libs/gateway';
 import { Database } from '#/db';
+import { FoodService, SuccessResponse } from '@libs/gateway';
 
-export default App.addCommand<Gateway.Food.Product.DeleteCommand>('food/product/delete', {
+export default App.addCommand<FoodService.Product.DeleteCommand>({
+  command: 'food/product/delete',
   validator: z.object({
     id: Components.Product.DeleteOneSchema.shape.id,
   }),
-  handler: async ({ data }, { user }) => {
+  handler: async ({ data, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {
       const found = await Components.Product.findFirst(
         {
@@ -19,7 +20,7 @@ export default App.addCommand<Gateway.Food.Product.DeleteCommand>('food/product/
       );
 
       if (!found) {
-        return Gateway.Food.Product.createNotFoundException({ id: data.id });
+        return new FoodService.Product.NotFoundException({ id: data.id });
       }
 
       const deleteResult = await Components.Product.deleteOne(
@@ -33,7 +34,7 @@ export default App.addCommand<Gateway.Food.Product.DeleteCommand>('food/product/
 
       await Components.Nutrients.deleteMany({ ids: [found.nutrientsId] }, { trx });
 
-      return Gateway.createResponse({
+      return new SuccessResponse({
         status: 200,
         data: undefined,
       });

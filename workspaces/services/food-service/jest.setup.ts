@@ -23,7 +23,7 @@ beforeAll(async () => {
   await Database.connect({ databaseUrl });
 
   execSync(
-    'npx prisma migrate dev --schema ./workspaces/services/food-service/prisma/schema.prisma',
+    'npx prisma db push --schema ./workspaces/services/food-service/prisma/schema.prisma',
     { env: process.env },
   );
 

@@ -1,4 +1,4 @@
-export interface IException<TType extends string, TDetails = null> {
+export interface IException<TType extends string = string, TDetails = null> {
   success: false;
   status: number;
   type: TType;
@@ -21,13 +21,4 @@ export class Exception<TType extends string, TDetails>
     this.message = arg.message;
     this.details = arg.details;
   }
-}
-
-export function createException<TType extends string, TDetails>(arg: {
-  type: TType;
-  status: number;
-  message: string;
-  details: TDetails;
-}) {
-  return new Exception(arg);
 }

@@ -12,8 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@libs/common": "^1.0.0",
     "@libs/gateway": "^1.0.0",
-    "@libs/service": "^1.0.0",
+    "@libs/service-utils": "^1.0.0",
     "@prisma/client": "^6.8.2",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

@@ -8,7 +8,7 @@ const testContext = {
 };
 
 export function createTestCommandContext(
-  arg: Partial<Pick<CommandContext, 'user'>> = {},
+  arg: Partial<CommandContext> = {},
 ): CommandContext {
   return {
     user: testContext.user,

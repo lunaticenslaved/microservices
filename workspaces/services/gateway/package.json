@@ -4,7 +4,9 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit",
+    "test": "APP_ENV=test jest"
   },
   "author": "",
   "license": "ISC",

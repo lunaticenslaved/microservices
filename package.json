@@ -12,7 +12,7 @@
     "typecheck": "lerna run typecheck",
     "lint:fix": "eslint ./workspaces --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix & prettier ./workspaces --write",
     "lint": "eslint ./workspaces --ext ts,tsx --report-unused-disable-directives --max-warnings=0 --quiet && prettier ./workspaces --check --log-level=warn",
-    "prisma:generate": "lerna run prisma:generate",
+    "db:push": "DATABASE_URL=postgres://user:password@localhost:6432/$SERVICE npx prisma db push --schema workspaces/services/$SERVICE-service/prisma/schema.prisma",
     "dev": "APP_ENV=dev docker-compose up --remove-orphans  --build"
   },
   "devDependencies": {

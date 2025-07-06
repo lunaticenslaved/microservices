@@ -1,4 +1,5 @@
-import { Gateway } from '@libs/gateway';
+import { Exception } from '@libs/gateway';
+
 import { Prisma, PrismaClient as PrismaClientGen } from './generated/client';
 
 export type PrismaClient = ReturnType<typeof createPrismaClient>;
@@ -16,7 +17,7 @@ function createPrismaClient(arg: { databaseUrl: string }) {
         return _prisma.$transaction(async trx => {
           const innerResult = await callback(trx);
 
-          if (innerResult instanceof Gateway.Exception) {
+          if (innerResult instanceof Exception) {
             await trx.$executeRaw`ROLLBACK`;
           }
 

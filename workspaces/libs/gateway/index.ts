@@ -1,2 +1,2 @@
-export * as Gateway from './index-ns';
-export * from './common';
+export * from './interfaces';
+export * from './service-contracts';

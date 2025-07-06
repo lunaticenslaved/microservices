@@ -1,5 +1,3 @@
-// TODO move it to @lib/utils
-
 export const Result = {
   success: <T>(data: T): ResultSuccess<T> => {
     return {
