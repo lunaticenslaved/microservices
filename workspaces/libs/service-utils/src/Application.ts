@@ -3,6 +3,7 @@ import z from 'zod/v4';
 import path from 'path';
 import fs from 'fs';
 import express from 'express';
+import jwt from 'jsonwebtoken';
 
 import {
   Exception,
@@ -13,12 +14,14 @@ import {
   SuccessResponse,
   ServiceCommandConfig,
   ExtractCommandContract,
+  NonGatewayAccessException,
 } from '@libs/gateway';
 
-import { ServiceConfig } from './types';
+import { AppEnv, AppConfig } from './types';
 
 // import cors from 'cors';
 // const CORS_ORIGIN_WHITELIST: string[] = [];
+const GATEWAY_TOKEN_HEADER = 'x-gateway-token';
 
 type ApplicationCommandConfig<T extends ServiceCommandConfig['command'], TContext> = {
   command: T;
@@ -33,16 +36,23 @@ type ApplicationCommandConfig<T extends ServiceCommandConfig['command'], TContex
 };
 
 type ApplicationConstructor<TConfig> = {
-  config: TConfig;
+  localConfig: TConfig;
+  config: {
+    env: AppEnv;
+    service: string;
+    jwtGatewaySecret: string;
+  };
 };
 
-export class Application<TConfig extends ServiceConfig, TCommandContext> {
+export class Application<TConfig, TCommandContext> {
   started = false;
 
-  config: TConfig;
+  localConfig: TConfig;
+  config: AppConfig;
 
   constructor(arg: ApplicationConstructor<TConfig>) {
     this.config = arg.config;
+    this.localConfig = arg.localConfig;
   }
 
   private commands: Record<
@@ -75,7 +85,9 @@ export class Application<TConfig extends ServiceConfig, TCommandContext> {
     port: number;
     commandsDirPath: string;
     connectDb: () => Promise<void>;
-    createCommandContext: (arg: { serviceConfig: TConfig }) => TCommandContext;
+    createCommandContext: (arg: {
+      app: Application<TConfig, TCommandContext>;
+    }) => TCommandContext;
   }) {
     const serviceTitle = `${this.config.service.toUpperCase()} SERVICE`;
 
@@ -113,11 +125,16 @@ export class Application<TConfig extends ServiceConfig, TCommandContext> {
       try {
         res.setHeader('content-type', 'application/json');
 
-        // FIXME check if the request is sent by Gateway
+        console.log(`[${serviceTitle}] [COMMAND] Checking gateway access...`);
+        const jwtGatewayToken = String(req.headers[GATEWAY_TOKEN_HEADER]);
+        const decoded = jwt.verify(jwtGatewayToken, this.config.jwtGatewaySecret);
+        if (typeof decoded !== 'object' || decoded.iss !== 'api-gateway') {
+          throw new NonGatewayAccessException();
+        }
 
         console.log(`[${serviceTitle}] [COMMAND]`, req.body);
 
-        const requestContext = arg.createCommandContext({ serviceConfig: this.config });
+        const requestContext = arg.createCommandContext({ app: this });
 
         console.log(`[${serviceTitle}] [COMMAND] Config found`);
         const commandConfig = this.findCommandConfigOfThrow(req.body?.command);

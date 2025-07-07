@@ -9,9 +9,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@libs/gateway": "^1.0.0",
     "@libs/common": "^1.0.0",
+    "@libs/gateway": "^1.0.0",
     "@prisma/client": "^6.10.1",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }

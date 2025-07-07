@@ -5,7 +5,8 @@ export type CommonExceptions =
   | RequestValidationException
   | UnknownException
   | UnknownException
-  | MicroserviceTimeoutException;
+  | MicroserviceTimeoutException
+  | NonGatewayAccessException;
 
 export class RequestValidationException extends Exception<
   'common/validation-error',
@@ -63,6 +64,20 @@ export class GatewayException extends Exception<'common/gateway-error', null> {
       type: 'common/gateway-error',
       status: 500,
       message: 'Gateway error',
+      details: null,
+    });
+  }
+}
+
+export class NonGatewayAccessException extends Exception<
+  'common/non-gateway-access-error',
+  null
+> {
+  constructor() {
+    super({
+      type: 'common/non-gateway-access-error',
+      status: 403,
+      message: 'Non-Gateway access is not allowed',
       details: null,
     });
   }

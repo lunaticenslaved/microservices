@@ -1,5 +1,6 @@
 import express from 'express';
 import { AxiosError } from 'axios';
+import jwt from 'jsonwebtoken';
 
 import { GatewayRequestSchema } from '@libs/gateway';
 import {
@@ -21,6 +22,8 @@ import {
 
 const PORT = 3000;
 const USER_ID = '054726b2-fafd-426c-a04e-ce744f1ecdab';
+const GATEWAY_TOKEN_HEADER = 'x-gateway-token';
+const JWT_GATEWAY_SECRET = process.env.JWT_GATEWAY_SECRET || '';
 
 const server = express();
 
@@ -28,8 +31,6 @@ server.use(express.json());
 
 server.post('/command', async (expressReq, expressRes) => {
   console.log('[GATEWAY] [COMMAND] Received');
-
-  // TODO add logs
 
   console.log('[GATEWAY] [COMMAND] Trying to parse request');
   const result = GatewayRequestSchema.safeParse(expressReq.body);
@@ -78,11 +79,27 @@ server.post('/command', async (expressReq, expressRes) => {
           `[GATEWAY] [COMMAND] Trying to connect '${service}' service on ${Endpoints[service]}`,
         );
 
+        const payload = {
+          iss: 'api-gateway', // Issuer
+          iat: Math.floor(Date.now() / 1000), // Issued at
+          exp: Math.floor(Date.now() / 1000) + 60 * 60, // Expires in 1 hour
+
+          // Custom claims
+          source: 'gateway',
+        };
+
+        const gatewayToken = jwt.sign(payload, JWT_GATEWAY_SECRET, {
+          algorithm: 'HS256',
+        });
+
         const axiosRes = await axiosInstance.post(
           `${Endpoints[service]}/command`,
           commandRequest,
           {
-            headers: forwardRequestHeaders(expressReq.headers, {}),
+            headers: {
+              ...forwardRequestHeaders(expressReq.headers, {}),
+              [GATEWAY_TOKEN_HEADER]: gatewayToken,
+            },
           },
         );
 
@@ -98,8 +115,6 @@ server.post('/command', async (expressReq, expressRes) => {
 
         // The microservice responded with an error
         if (axiosErr.response) {
-          // TODO check and parse exception
-
           forwardResponseHeaders(axiosErr.response, expressRes);
 
           expressRes.status(axiosErr.response.status).json(axiosErr.response.data);

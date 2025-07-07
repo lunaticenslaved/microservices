@@ -1,6 +1,7 @@
-export type ServiceConfig = {
+export type AppConfig = {
   service: string;
   env: AppEnv;
+  jwtGatewaySecret: string;
 };
 
 export enum AppEnv {

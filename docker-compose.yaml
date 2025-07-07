@@ -61,6 +61,7 @@ services:
       - APP_ENV=${APP_ENV}
       - ENDPOINT__FOOD_SERVICE=http://food-service:3000
       - ENDPOINT__TAG_SERVICE=http://tag-service:3000
+      - JWT_GATEWAY_SECRET=${JWT_GATEWAY_SECRET}
     depends_on:
       - tag-service
       - food-service
@@ -75,6 +76,7 @@ services:
     environment:
       - APP_ENV=${APP_ENV}
       - DATABASE_URL=postgres://user:password@postgres:5432/tag
+      - JWT_GATEWAY_SECRET=${JWT_GATEWAY_SECRET}
     depends_on:
       postgres:
         condition: service_healthy
@@ -89,6 +91,7 @@ services:
     environment:
       - APP_ENV=${APP_ENV}
       - DATABASE_URL=postgres://user:password@postgres:5432/food
+      - JWT_GATEWAY_SECRET=${JWT_GATEWAY_SECRET}
     depends_on:
       postgres:
         condition: service_healthy
