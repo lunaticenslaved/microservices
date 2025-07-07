@@ -3,12 +3,19 @@ import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
 import { SuccessResponse } from '@libs/gateway';
+import { NutrientsSchema, ProductSchema } from '@libs/domain/food';
 
 export default App.addCommand({
   command: 'food/product/create',
   validator: z.object({
-    name: Components.Product.CreateSchema.shape.name,
-    nutrients: Components.Nutrients.CreateSchema,
+    name: ProductSchema.shape.name,
+    nutrients: NutrientsSchema.pick({
+      proteins: true,
+      calories: true,
+      carbs: true,
+      fats: true,
+      fibers: true,
+    }).partial(),
   }),
   handler: async ({ data, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {
@@ -20,31 +27,30 @@ export default App.addCommand({
         return nutrientsResult.error;
       }
 
-      const createResult = await Components.Product.create(
+      const createdResult = await Components.Product.create(
         {
-          userId: user.id,
           name: data.name,
           nutrientsId: nutrientsResult.data.id,
         },
         {
           trx,
+          user,
         },
       );
 
-      if (!createResult.success) {
-        return createResult.error;
+      if (!createdResult.success) {
+        return createdResult.error;
       }
 
-      const productId = createResult.data.id;
-      const created = await Components.Product.findFirst_DTO(
-        { id: productId, userId: user.id },
-        { trx },
+      const [created] = await Components.Product.findMany_DTO(
+        {
+          id: { in: [createdResult.data.id] },
+        },
+        {
+          trx,
+          user,
+        },
       );
-
-      if (!created) {
-        // Cannot be here
-        throw new Error('Product not found!');
-      }
 
       return new SuccessResponse({
         status: 201,

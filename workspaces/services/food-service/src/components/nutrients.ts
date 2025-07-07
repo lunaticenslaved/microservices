@@ -9,21 +9,11 @@ import { Result, ResultSuccess } from '@libs/common';
 export type CreateRequest = z.infer<typeof CreateSchema>;
 export const CreateSchema = z
   .object({
-    calories: ServiceUtils.numberCreate
-      .schema(FoodDomain.NutrientsSchema.shape.calories)
-      .optional(),
-    proteins: ServiceUtils.numberCreate
-      .schema(FoodDomain.NutrientsSchema.shape.proteins)
-      .optional(),
-    fats: ServiceUtils.numberCreate
-      .schema(FoodDomain.NutrientsSchema.shape.fats)
-      .optional(),
-    carbs: ServiceUtils.numberCreate
-      .schema(FoodDomain.NutrientsSchema.shape.carbs)
-      .optional(),
-    fibers: ServiceUtils.numberCreate
-      .schema(FoodDomain.NutrientsSchema.shape.fibers)
-      .optional(),
+    calories: FoodDomain.NutrientsSchema.shape.calories.optional(),
+    proteins: FoodDomain.NutrientsSchema.shape.proteins.optional(),
+    fats: FoodDomain.NutrientsSchema.shape.fats.optional(),
+    carbs: FoodDomain.NutrientsSchema.shape.carbs.optional(),
+    fibers: FoodDomain.NutrientsSchema.shape.fibers.optional(),
   })
   .optional();
 export async function create(
@@ -38,21 +28,11 @@ export async function create(
 
   const { id } = await context.trx.nutrients.create({
     data: {
-      calories: parsed.data?.calories
-        ? ServiceUtils.numberCreate.prisma(parsed.data.calories)
-        : undefined,
-      proteins: parsed.data?.proteins
-        ? ServiceUtils.numberCreate.prisma(parsed.data.proteins)
-        : undefined,
-      fats: parsed.data?.fats
-        ? ServiceUtils.numberCreate.prisma(parsed.data.fats)
-        : undefined,
-      carbs: parsed.data?.carbs
-        ? ServiceUtils.numberCreate.prisma(parsed.data.carbs)
-        : undefined,
-      fibers: parsed.data?.fibers
-        ? ServiceUtils.numberCreate.prisma(parsed.data.fibers)
-        : undefined,
+      calories: parsed.data?.calories ? parsed.data.calories : undefined,
+      proteins: parsed.data?.proteins ? parsed.data.proteins : undefined,
+      fats: parsed.data?.fats ? parsed.data.fats : undefined,
+      carbs: parsed.data?.carbs ? parsed.data.carbs : undefined,
+      fibers: parsed.data?.fibers ? parsed.data.fibers : undefined,
     },
     select: {
       id: true,

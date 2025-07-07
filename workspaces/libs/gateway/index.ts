@@ -1,5 +1,5 @@
 export * from './interfaces';
-export * from './service-contracts';
+export * from './api-microservice';
 
 export { type IGatewayRequest, GatewayRequestSchema } from './GatewayRequest';
 export { type IGatewayResponse } from './GatewayResponse';

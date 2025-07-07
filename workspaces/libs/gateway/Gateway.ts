@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 
-import { ServiceCommandConfig } from './service-contracts';
+import { ServiceCommandConfig } from './api-microservice';
 import { MicroserviceTimeoutException, GatewayException } from './interfaces';
 import { IGatewayRequest } from './GatewayRequest';
 import { IGatewayResponse } from './GatewayResponse';

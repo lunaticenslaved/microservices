@@ -1,14 +1,10 @@
-import { StringCreate } from '@libs/common';
-
 import { ICommandContract, Exception } from '../../interfaces';
 
-type Service = 'food';
-type ItemType = 'product';
+type ItemType = 'food/product';
 
 export type DTO = {
   id: string;
   userId: string;
-  service: Service;
   itemType: ItemType;
 };
 
@@ -30,9 +26,9 @@ export type CreateCommand = ICommandContract<{
   command: 'tag/unique-key/create';
   request: {
     data: {
-      itemType: 'product';
-      key: StringCreate;
+      itemType: ItemType;
       itemId: string;
+      key: string;
     };
     enrichments: {
       user: true;

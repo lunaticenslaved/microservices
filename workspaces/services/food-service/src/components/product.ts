@@ -1,9 +1,19 @@
-import z from 'zod/v4';
+import { Result } from '@libs/common';
+import { FoodProduct } from '@libs/gateway';
+
 import { PrismaTransaction } from '#/db';
-import { FoodDomain } from '@libs/domain';
-import { ServiceUtils } from '@libs/service-utils';
-import { Result, ResultSuccess } from '@libs/common';
-import { FoodProduct, RequestValidationException } from '@libs/gateway';
+
+type ListFilter = {
+  id?: { in: string[] };
+  name?: { in: string[] };
+};
+
+function listFilter(arg: ListFilter) {
+  return {
+    id: arg.id,
+    name: arg.name,
+  };
+}
 
 const DTO_SELECT = {
   id: true,
@@ -19,163 +29,80 @@ const DTO_SELECT = {
   },
 };
 
-// CHECK IF NAME UNIQUE -----------------------------------------------------------------
-async function checkIfNameUnique(
-  arg: { name: string },
-  context: { trx: PrismaTransaction },
-): Promise<{ unique: boolean }> {
+type CallContext = {
+  trx: PrismaTransaction;
+  user: { id: string };
+};
+
+async function checkIfNameUnique(arg: { name: string }, context: CallContext) {
   const found = await context.trx.product.findFirst({
     where: {
       name: arg.name,
+      userId: context.user.id,
     },
     select: {
       id: true,
     },
   });
 
-  return {
-    unique: !found,
-  };
+  return !found;
 }
 
-// FIND FIRST PRODUCT -------------------------------------------------------------------
-export type FindFirstRequest = z.infer<typeof FindFirstSchema>;
-export const FindFirstSchema = z.union([
-  z.object({
-    id: FoodDomain.ProductSchema.shape.id,
-    userId: FoodDomain.ProductSchema.shape.userId,
-  }),
-  z.object({
-    name: FoodDomain.ProductSchema.shape.name,
-    userId: FoodDomain.ProductSchema.shape.userId,
-  }),
-]);
-export async function findFirst_DTO(
-  arg: FindFirstRequest,
-  context: { trx: PrismaTransaction },
-): Promise<FoodProduct.DTO | null> {
-  if ('id' in arg) {
-    return await context.trx.product.findFirst({
-      select: DTO_SELECT,
-      where: {
-        id: arg.id,
-        userId: arg.userId,
-      },
-    });
-  }
-
-  return await context.trx.product.findFirst({
-    select: DTO_SELECT,
-    where: {
-      name: arg.name,
-      userId: arg.userId,
-    },
-  });
-}
-export async function findFirst(
-  arg: FindFirstRequest,
-  context: { trx: PrismaTransaction },
-): Promise<FoodDomain.Product | null> {
-  const select = {
-    id: true,
-    name: true,
-    nutrientsId: true,
-    userId: true,
-  };
-
-  if ('id' in arg) {
-    return await context.trx.product.findFirst({
-      select,
-      where: {
-        id: arg.id,
-        userId: arg.userId,
-      },
-    });
-  }
-
-  return await context.trx.product.findFirst({
-    select,
-    where: {
-      name: arg.name,
-      userId: arg.userId,
-    },
-  });
-}
-
-// FIND MANY PRODUCTS
-export type FindManyRequest = z.infer<typeof FindManySchema>;
-export const FindManySchema = z.object({
-  userId: FoodDomain.ProductSchema.shape.userId,
-});
 export async function findMany_DTO(
-  arg: FindManyRequest,
-  context: { trx: PrismaTransaction },
-): Promise<ResultSuccess<FoodProduct.DTO[]>> {
-  const items = await context.trx.product.findMany({
+  arg: ListFilter,
+  context: CallContext,
+): Promise<FoodProduct.DTO[]> {
+  return await context.trx.product.findMany({
     select: DTO_SELECT,
     where: {
-      userId: arg.userId,
+      ...listFilter(arg),
+      userId: context.user.id,
     },
   });
-
-  return Result.success(items);
 }
 
-// CREATE PRODUCT ----------------------------------------------------------------------
-export type CreateRequest = z.infer<typeof CreateSchema>;
-export const CreateSchema = z.object({
-  userId: FoodDomain.ProductSchema.shape.userId,
-  nutrientsId: FoodDomain.ProductSchema.shape.nutrientsId,
-  name: ServiceUtils.stringCreate.schema(FoodDomain.ProductSchema.shape.name),
-});
+export async function findMany(arg: ListFilter, context: CallContext) {
+  return await context.trx.product.findMany({
+    where: {
+      ...listFilter(arg),
+      userId: context.user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      nutrientsId: true,
+      userId: true,
+    },
+  });
+}
+
 export async function create(
-  arg: CreateRequest,
-  context: { trx: PrismaTransaction },
-): Promise<Result<{ id: string }, FoodProduct.NameNotUniqueException>> {
-  const name = arg.name.value;
-
-  const { unique } = await checkIfNameUnique({ name }, context);
-
-  if (!unique) {
-    return Result.error(new FoodProduct.NameNotUniqueException({ name }));
+  arg: { name: string; nutrientsId: string },
+  context: CallContext,
+) {
+  const isNameUnique = await checkIfNameUnique({ name: arg.name }, context);
+  if (!isNameUnique) {
+    return Result.error(new FoodProduct.NameNotUniqueException({ name: arg.name }));
   }
 
-  const created = await context.trx.product.create({
+  const result = await context.trx.product.create({
     data: {
-      userId: arg.userId,
       nutrientsId: arg.nutrientsId,
-      name: ServiceUtils.stringCreate.prisma(arg.name),
+      userId: context.user.id,
+      name: arg.name,
     },
     select: {
       id: true,
     },
   });
 
-  return Result.success(created);
+  return Result.success(result);
 }
 
-// UPDATE PRODUCT ----------------------------------------------------------------------
-export type UpdateRequest = z.infer<typeof UpdateSchema>;
-export const UpdateSchema = z.object({
-  id: FoodDomain.ProductSchema.shape.id,
-  name: ServiceUtils.stringUpdate.schema(FoodDomain.ProductSchema.shape.name),
-});
-export async function update(
-  arg: UpdateRequest,
-  context: { trx: PrismaTransaction },
-): Promise<
-  Result<null, FoodProduct.NameNotUniqueException | RequestValidationException>
-> {
-  const parsed = z.safeParse(UpdateSchema, arg);
-
-  if (!parsed.success) {
-    return Result.error(new RequestValidationException({ issues: parsed.error.issues }));
-  }
-
+export async function update(arg: { id: string; name: string }, context: CallContext) {
   // Check if name is unique
-  const name = arg.name.value;
-  const { unique } = await checkIfNameUnique({ name }, context);
-  if (!unique) {
+  const name = arg.name;
+  if (!(await checkIfNameUnique({ name }, context))) {
     return Result.error(new FoodProduct.NameNotUniqueException({ name }));
   }
 
@@ -183,50 +110,20 @@ export async function update(
   await context.trx.product.update({
     where: {
       id: arg.id,
+      userId: context.user.id,
     },
     data: {
-      name: ServiceUtils.stringUpdate.prisma(arg.name),
+      name: arg.name,
     },
   });
 
   return Result.success(null);
 }
 
-// DELETE PRODUCT ----------------------------------------------------------------------
-export type DeleteOneRequest = z.infer<typeof DeleteOneSchema>;
-export const DeleteOneSchema = z.object({
-  id: FoodDomain.ProductSchema.shape.id,
-  userId: FoodDomain.ProductSchema.shape.userId,
-});
-export async function deleteOne(
-  arg: DeleteOneRequest,
-  context: { trx: PrismaTransaction },
-): Promise<Result<void, FoodProduct.NotFoundException>> {
-  const found = await findFirst(arg, context);
-
-  if (!found) {
-    return Result.error(new FoodProduct.NotFoundException(arg));
-  }
-
-  return Result.success(undefined);
-}
-
-// DELETE MANY PRODUCTS ----------------------------------------------------------------------
-export type DeleteManyRequest = z.infer<typeof DeleteManySchema>;
-export const DeleteManySchema = z.object({
-  ids: z.array(FoodDomain.ProductSchema.shape.id),
-  userId: FoodDomain.ProductSchema.shape.userId,
-});
-export async function deleteMany(
-  arg: DeleteManyRequest,
-  context: { trx: PrismaTransaction },
-): Promise<ResultSuccess<{ count: number }>> {
+export async function deleteMany(arg: ListFilter, context: CallContext) {
   const { count } = await context.trx.product.deleteMany({
-    where: {
-      id: { in: arg.ids },
-      userId: arg.userId,
-    },
+    where: listFilter(arg),
   });
 
-  return Result.success({ count });
+  return { count };
 }

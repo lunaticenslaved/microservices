@@ -7,13 +7,18 @@ import { FoodProduct, SuccessResponse } from '@libs/gateway';
 export default App.addCommand({
   command: 'food/product/find-first',
   validator: z.object({
-    id: Components.Product.DeleteOneSchema.shape.id,
+    id: z.string(),
   }),
   handler: async ({ data, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {
-      const found = await Components.Product.findFirst_DTO(
-        { id: data.id, userId: user.id },
-        { trx },
+      const [found] = await Components.Product.findMany_DTO(
+        {
+          id: { in: [data.id] },
+        },
+        {
+          trx,
+          user,
+        },
       );
 
       if (!found) {

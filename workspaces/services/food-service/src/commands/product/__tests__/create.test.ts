@@ -10,13 +10,13 @@ type CreateCommand = FoodProduct.CreateCommand;
 describe('validator is valid', () => {
   test('name is trimmed', () => {
     const request: CreateCommand['request']['data'] = {
-      name: { value: ' name ' },
+      name: ' name ',
       nutrients: {
-        calories: { value: 0 },
-        proteins: { value: 0 },
-        fats: { value: 0 },
-        carbs: { value: 0 },
-        fibers: { value: 0 },
+        calories: 0,
+        proteins: 0,
+        fats: 0,
+        carbs: 0,
+        fibers: 0,
       },
     };
 
@@ -24,7 +24,7 @@ describe('validator is valid', () => {
     expect(parsed.success).toBeTruthy();
 
     if (!parsed.success) return;
-    expect(parsed.data.name.value).toBe('name');
+    expect(parsed.data.name).toBe('name');
   });
 });
 
@@ -37,7 +37,7 @@ describe('can create product', () => {
       {
         command: 'food/product/create',
         data: {
-          name: { value: 'product-1 ' },
+          name: 'product-1 ',
         },
         enrichments: {
           user: {

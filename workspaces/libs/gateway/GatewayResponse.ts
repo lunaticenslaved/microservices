@@ -1,4 +1,4 @@
-import { ServiceCommandConfig, ExtractCommandContract } from './service-contracts';
+import { ServiceCommandConfig, ExtractCommandContract } from './api-microservice';
 import { ICommandResponse } from './interfaces';
 
 export type IGatewayResponse<

@@ -4,7 +4,7 @@ import {
   ServiceCommandConfig,
   Service,
   ExtractCommandContract,
-} from './service-contracts';
+} from './api-microservice';
 
 export const GatewayRequestSchema = z.object({
   command: z.custom<`${Service}/${string}`>(

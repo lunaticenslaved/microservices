@@ -3,14 +3,25 @@ import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
 import { FoodProduct, SuccessResponse } from '@libs/gateway';
+import { ProductSchema } from '@libs/domain/food';
 
 App.addCommand({
   command: 'food/product/update',
+  validator: z.object({
+    id: ProductSchema.shape.id,
+    name: ProductSchema.shape.name,
+    nutrients: Components.Nutrients.UpdateSchema,
+  }),
   handler: async ({ data, enrichments: { user } }) => {
     return await Database.prisma.$noThrowTransaction(async trx => {
-      const product = await Components.Product.findFirst(
-        { id: data.id, userId: user.id },
-        { trx },
+      const [product] = await Components.Product.findMany(
+        {
+          id: { in: [data.id] },
+        },
+        {
+          trx,
+          user,
+        },
       );
 
       if (!product) {
@@ -18,7 +29,16 @@ App.addCommand({
       }
 
       if (data.name) {
-        await Components.Product.update({ id: product.id, name: data.name }, { trx });
+        await Components.Product.update(
+          {
+            id: product.id,
+            name: data.name,
+          },
+          {
+            trx,
+            user,
+          },
+        );
       }
 
       await Components.Nutrients.update(
@@ -26,15 +46,10 @@ App.addCommand({
         { trx },
       );
 
-      const updated = await Components.Product.findFirst_DTO(
-        { id: data.id, userId: user.id },
-        { trx },
+      const [updated] = await Components.Product.findMany_DTO(
+        { id: { in: [data.id] } },
+        { trx, user },
       );
-
-      if (!updated) {
-        // Cannot be here
-        throw new Error('Product not found!');
-      }
 
       return new SuccessResponse({
         status: 200,
@@ -42,9 +57,4 @@ App.addCommand({
       });
     });
   },
-  validator: z.object({
-    id: Components.Product.UpdateSchema.shape.id,
-    name: Components.Product.UpdateSchema.shape.name,
-    nutrients: Components.Nutrients.UpdateSchema,
-  }),
 });

@@ -1,5 +1,5 @@
 import { FoodDomain } from '@libs/domain';
-import { NumberCreate, NumberUpdate, StringCreate, StringUpdate } from '@libs/common';
+import { NumberUpdate } from '@libs/common';
 
 import { Exception, ICommandContract } from '../../interfaces';
 
@@ -45,13 +45,13 @@ export type CreateCommand = ICommandContract<{
   command: 'food/product/create';
   request: {
     data: {
-      name: StringCreate;
+      name: string;
       nutrients?: {
-        calories?: NumberCreate;
-        proteins?: NumberCreate;
-        fats?: NumberCreate;
-        carbs?: NumberCreate;
-        fibers?: NumberCreate;
+        calories?: number;
+        proteins?: number;
+        fats?: number;
+        carbs?: number;
+        fibers?: number;
       };
     };
     enrichments: {
@@ -70,7 +70,7 @@ export type UpdateCommand = ICommandContract<{
   request: {
     data: {
       id: string;
-      name?: StringUpdate;
+      name?: string;
       nutrients?: {
         calories?: NumberUpdate;
         proteins?: NumberUpdate;
@@ -128,7 +128,7 @@ export type FindManyCommand = ICommandContract<{
   command: 'food/product/find-many';
   request: {
     data: {
-      id: string;
+      id: { in: string[] };
     };
     enrichments: {
       user: true;
