@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@libs/domain": "^1.0.0",
     "@libs/common": "^1.0.0",
+    "@libs/domain": "^1.0.0",
+    "axios": "^1.10.0",
     "zod": "^3.25.56"
   }
 }

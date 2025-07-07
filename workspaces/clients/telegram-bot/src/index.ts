@@ -1,18 +1,13 @@
 import 'dotenv/config';
 
 import express from 'express';
-import axios, { AxiosError } from 'axios';
 import YAML from 'yaml';
-import {
-  Exception,
-  GatewayRequestSchema,
-  IGatewayResponse,
-  RequestValidationException,
-  UnknownException,
-} from '@libs/gateway';
+import { Gateway, GatewayRequestSchema, RequestValidationException } from '@libs/gateway';
 
 const PORT = 3000;
 const GATEWAY_ENDPOINT = process.env.GATEWAY_ENDPOINT || '';
+
+const gateway = new Gateway({ endpoint: GATEWAY_ENDPOINT });
 
 const app = express();
 
@@ -36,19 +31,7 @@ app.post('/test-message', async (req, res) => {
 
     res.status(result.status).send(result).json().end();
   } else {
-    const result = await axios
-      .post<IGatewayResponse>(`${GATEWAY_ENDPOINT}/command`, validatedBody.data, {
-        headers: {
-          'Content-type': 'application/json; charset=UTF-8',
-        },
-      })
-      .then(res => res.data as IGatewayResponse)
-      .catch(
-        error =>
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ((error as AxiosError).response?.data as Exception<any, any>) ||
-          new UnknownException(),
-      );
+    const result = await gateway.command(validatedBody.data);
 
     if (!result.success) {
       console.error('[TELEGRAM BOT] [COMMAND ERROR]', JSON.stringify(result, null, 2));
