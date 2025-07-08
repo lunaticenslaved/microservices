@@ -1,30 +1,27 @@
 import { ServiceContract } from '../../interfaces/ServiceContract';
 
 import * as FoodProduct from './product';
+import * as FoodMeal from './meal';
 
 export type FoodCommandConfig =
+  // Product
   | FoodProduct.CreateCommand
   | FoodProduct.UpdateCommand
   | FoodProduct.DeleteCommand
-  | FoodProduct.FindFirstCommand
-  | FoodProduct.FindManyCommand;
+  | FoodProduct.FindManyCommand
+
+  // Meal
+  | FoodMeal.CreateCommand;
 
 export const FoodContract = new ServiceContract<FoodCommandConfig>({
-  'food/product/create': {
-    request: { enrichments: { user: true } },
-  },
-  'food/product/update': {
-    request: { enrichments: { user: true } },
-  },
-  'food/product/delete': {
-    request: { enrichments: { user: true } },
-  },
-  'food/product/find-first': {
-    request: { enrichments: { user: true } },
-  },
-  'food/product/find-many': {
-    request: { enrichments: { user: true } },
-  },
+  // Product
+  'food/product/create': { request: { enrichments: { user: true } } },
+  'food/product/update': { request: { enrichments: { user: true } } },
+  'food/product/delete': { request: { enrichments: { user: true } } },
+  'food/product/find-many': { request: { enrichments: { user: true } } },
+
+  // Meal
+  'food/meal/create': { request: { enrichments: { user: true } } },
 });
 
 export { FoodProduct };

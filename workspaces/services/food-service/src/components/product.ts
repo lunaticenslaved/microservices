@@ -4,14 +4,28 @@ import { FoodProduct } from '@libs/gateway';
 import { PrismaTransaction } from '#/db';
 
 type ListFilter = {
-  id?: { in: string[] };
-  name?: { in: string[] };
+  where?: {
+    id?: { in: string[] };
+    name?: {
+      startsWith?: string;
+      mode?: 'case-sensitive' | 'case-insensitive';
+      in?: string[];
+    };
+  };
 };
 
 function listFilter(arg: ListFilter) {
   return {
-    id: arg.id,
-    name: arg.name,
+    id: arg.where?.id,
+    name: arg.where?.name
+      ? {
+          ...arg.where.name,
+          mode:
+            arg.where.name.mode === 'case-insensitive'
+              ? ('insensitive' as const)
+              : ('default' as const),
+        }
+      : undefined,
   };
 }
 

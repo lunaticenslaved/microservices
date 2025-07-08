@@ -1,19 +1,31 @@
 import { App } from '#/app';
 import { Components } from '#/components';
-import z from 'zod/v4';
 import { Database } from '#/db';
 import { SuccessResponse } from '@libs/gateway';
+import z from 'zod/v4';
 
 export default App.addCommand({
   command: 'food/product/find-many',
   validator: z.object({
-    id: z.object({ in: z.array(z.string()) }),
+    where: z
+      .object({
+        id: z.object({ in: z.array(z.string()) }),
+        name: z
+          .object({
+            startsWith: z.string(),
+            mode: z.enum(['case-sensitive', 'case-insensitive']),
+            in: z.array(z.string()),
+          })
+          .partial(),
+      })
+      .partial()
+      .optional(),
   }),
-  handler: async ({ data: { id }, enrichments: { user } }) => {
+  handler: async ({ data: { where }, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {
       const items = await Components.Product.findMany_DTO(
         {
-          id,
+          where,
         },
         {
           trx,

@@ -4,7 +4,11 @@ export { SuccessResponse } from './Response';
 
 export { type ICommandContract } from './CommandContract';
 export { type ICommandRequest } from './CommandRequest';
-export { type ICommandResponse } from './CommandResponse';
+export {
+  type ICommandResponse,
+  type ICommandSuccessResponse,
+  type ICommandErrorResponse,
+} from './CommandResponse';
 
 export { ServiceContract } from './ServiceContract';
 

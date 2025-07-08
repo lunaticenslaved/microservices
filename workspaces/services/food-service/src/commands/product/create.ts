@@ -9,13 +9,15 @@ export default App.addCommand({
   command: 'food/product/create',
   validator: z.object({
     name: ProductSchema.shape.name,
-    nutrients: NutrientsSchema.pick({
-      proteins: true,
-      calories: true,
-      carbs: true,
-      fats: true,
-      fibers: true,
-    }).partial(),
+    nutrients: z
+      .object({
+        calories: NutrientsSchema.shape.calories.optional(),
+        proteins: NutrientsSchema.shape.proteins.optional(),
+        fats: NutrientsSchema.shape.fats.optional(),
+        carbs: NutrientsSchema.shape.carbs.optional(),
+        fibers: NutrientsSchema.shape.fibers.optional(),
+      })
+      .optional(),
   }),
   handler: async ({ data, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {
@@ -44,7 +46,7 @@ export default App.addCommand({
 
       const [created] = await Components.Product.findMany_DTO(
         {
-          id: { in: [createdResult.data.id] },
+          where: { id: { in: [createdResult.data.id] } },
         },
         {
           trx,

@@ -3,20 +3,27 @@ import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
 import { FoodProduct, SuccessResponse } from '@libs/gateway';
-import { ProductSchema } from '@libs/domain/food';
+import { createNumberUpdateSchema } from '@libs/service-utils';
+import { NutrientsSchema, ProductSchema } from '@libs/domain/food';
 
 App.addCommand({
   command: 'food/product/update',
   validator: z.object({
     id: ProductSchema.shape.id,
-    name: ProductSchema.shape.name,
-    nutrients: Components.Nutrients.UpdateSchema,
+    name: ProductSchema.shape.name.optional(),
+    nutrients: z.object({
+      calories: createNumberUpdateSchema(NutrientsSchema.shape.calories).optional(),
+      proteins: createNumberUpdateSchema(NutrientsSchema.shape.proteins).optional(),
+      fats: createNumberUpdateSchema(NutrientsSchema.shape.fats).optional(),
+      carbs: createNumberUpdateSchema(NutrientsSchema.shape.carbs).optional(),
+      fibers: createNumberUpdateSchema(NutrientsSchema.shape.fibers).optional(),
+    }),
   }),
   handler: async ({ data, enrichments: { user } }) => {
     return await Database.prisma.$noThrowTransaction(async trx => {
       const [product] = await Components.Product.findMany(
         {
-          id: { in: [data.id] },
+          where: { id: { in: [data.id] } },
         },
         {
           trx,
@@ -47,7 +54,7 @@ App.addCommand({
       );
 
       const [updated] = await Components.Product.findMany_DTO(
-        { id: { in: [data.id] } },
+        { where: { id: { in: [data.id] } } },
         { trx, user },
       );
 

@@ -1,46 +1,27 @@
-import 'dotenv/config';
-
 import express from 'express';
-import YAML from 'yaml';
-import { Gateway, GatewayRequestSchema, RequestValidationException } from '@libs/gateway';
+
+import messages from './messages';
 
 const PORT = 3000;
-const GATEWAY_ENDPOINT = process.env.GATEWAY_ENDPOINT || '';
-
-const gateway = new Gateway({ endpoint: GATEWAY_ENDPOINT });
 
 const app = express();
 
 app.use(express.text());
 
 app.post('/test-message', async (req, res) => {
-  console.log(req.body, GATEWAY_ENDPOINT);
   const message = req.body;
 
-  // FIXME catch error send common error
-  const actionRequest = YAML.parse(message);
-  console.log('[TELEGRAM BOT] Received message:', actionRequest);
+  for (const messageConfig of messages) {
+    if (messageConfig.isMatch(message)) {
+      const result = await messageConfig.handle(message);
 
-  const validatedBody = GatewayRequestSchema.safeParse(actionRequest);
-  console.log('[TELEGRAM BOT] Validation success:', validatedBody.success);
+      res.json(result);
 
-  if (!validatedBody.success) {
-    const result = new RequestValidationException({ issues: validatedBody.error.issues });
-
-    console.error('[TELEGRAM BOT] [COMMAND ERROR]', JSON.stringify(result, null, 2));
-
-    res.status(result.status).send(result).json().end();
-  } else {
-    const result = await gateway.command(validatedBody.data);
-
-    if (!result.success) {
-      console.error('[TELEGRAM BOT] [COMMAND ERROR]', JSON.stringify(result, null, 2));
-    } else {
-      console.log('[TELEGRAM BOT] [COMMAND SUCCESS]', JSON.stringify(result, null, 2));
+      return;
     }
-
-    res.status(result.status).send(result).json().end();
   }
+
+  res.json('Unknown message config');
 });
 
 app.listen(PORT, () => {

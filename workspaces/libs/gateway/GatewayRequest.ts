@@ -23,7 +23,7 @@ export const GatewayRequestSchema = z.object({
 export interface IGatewayRequest<
   T extends ServiceCommandConfig['command'] = ServiceCommandConfig['command'],
 > {
-  command: `${Service}/${string}`;
+  command: T;
   data: ExtractCommandContract<T>['request']['data'];
 }
 

@@ -1,11 +1,9 @@
-// import z from 'zod/v4';
 import { ExtractCommandContract, ServiceCommandConfig } from '../api-microservice';
 
 import { ICommandContract } from './CommandContract';
 
 type SavedConfig<T extends ICommandContract> = {
   request: {
-    // validator: z.ZodType<T['request']['data']>;
     enrichments: T['request']['enrichments'];
   };
 };

@@ -1,4 +1,4 @@
-export type NumberUpdate = { value: number };
+export type NumberUpdate = { set: number };
 
 export type StringUpdate = { value: string };
 

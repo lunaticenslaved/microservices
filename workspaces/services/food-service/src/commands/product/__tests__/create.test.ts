@@ -26,6 +26,15 @@ describe('validator is valid', () => {
     if (!parsed.success) return;
     expect(parsed.data.name).toBe('name');
   });
+
+  test('check pass without nutrients', () => {
+    const request: CreateCommand['request']['data'] = {
+      name: 'name-1',
+    };
+
+    const parsed = createCommand.validator.safeParse(request);
+    expect(parsed.success).toBeTruthy();
+  });
 });
 
 describe('can create product', () => {

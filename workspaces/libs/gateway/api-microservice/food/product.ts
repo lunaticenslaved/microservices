@@ -18,11 +18,14 @@ export class NameNotUniqueException extends Exception<
 }
 
 export class NotFoundException extends Exception<'food/product/not-found', null> {
-  constructor(arg: { id: string }) {
+  constructor(arg: { id: string } | { name: string }) {
     super({
       type: 'food/product/not-found',
       status: 404,
-      message: `Product with id '${arg.id}' not found`,
+      message:
+        'id' in arg
+          ? `Product with id '${arg.id}' not found`
+          : `Product with name '${arg.name}' not found`,
       details: null,
     });
   }
@@ -106,29 +109,19 @@ export type DeleteCommand = ICommandContract<{
   exceptions: NotFoundException;
 }>;
 
-// FIND FIRST ----------------------------------------------------------------------------
-export type FindFirstCommand = ICommandContract<{
-  command: 'food/product/find-first';
-  request: {
-    data: {
-      id: string;
-    };
-    enrichments: {
-      user: true;
-    };
-  };
-  response: {
-    data: DTO;
-  };
-  exceptions: NotFoundException;
-}>;
-
 // FIND MANY -----------------------------------------------------------------------------
 export type FindManyCommand = ICommandContract<{
   command: 'food/product/find-many';
   request: {
     data: {
-      id: { in: string[] };
+      where?: {
+        id?: { in: string[] };
+        name?: {
+          startsWith?: string;
+          mode?: 'case-sensitive' | 'case-insensitive';
+          in?: string[];
+        };
+      };
     };
     enrichments: {
       user: true;

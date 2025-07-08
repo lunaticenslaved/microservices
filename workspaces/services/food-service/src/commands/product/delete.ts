@@ -1,19 +1,20 @@
 import { App } from '#/app';
 import { Components } from '#/components';
-import z from 'zod/v4';
 import { Database } from '#/db';
+import { ProductSchema } from '@libs/domain/food';
 import { FoodProduct, SuccessResponse } from '@libs/gateway';
+import z from 'zod/v4';
 
 export default App.addCommand({
   command: 'food/product/delete',
   validator: z.object({
-    id: z.string(),
+    id: ProductSchema.shape.id,
   }),
   handler: async ({ data, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {
       const [found] = await Components.Product.findMany(
         {
-          id: { in: [data.id] },
+          where: { id: { in: [data.id] } },
         },
         {
           trx,
@@ -26,7 +27,9 @@ export default App.addCommand({
       }
 
       await Components.Product.deleteMany(
-        { id: { in: [found.id] } },
+        {
+          where: { id: { in: [found.id] } },
+        },
         {
           trx,
           user,

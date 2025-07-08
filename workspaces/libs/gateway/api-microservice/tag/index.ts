@@ -6,7 +6,9 @@ export { TagUniqueKey };
 
 export const TagContract = new ServiceContract<TagCommandConfig>({
   'tag/unique-key/create': {
-    request: { enrichments: { user: true } },
+    request: {
+      enrichments: { user: true },
+    },
   },
 });
 

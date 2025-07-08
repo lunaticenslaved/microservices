@@ -2,8 +2,8 @@
   "compilerOptions": {
     "module": "CommonJS",
     "types": ["node", "jest", "express"],
-    "target": "es6",
-    "lib": ["es6"],
+    "target": "es2024",
+    "lib": ["ES2024"],
     "skipLibCheck": true,
     "composite": false,
     "declaration": false,

@@ -4,11 +4,11 @@ import { NumberUpdate } from '@libs/common';
 export const ServiceUtils = {
   numberUpdate: {
     schema: (value: z.ZodNumber): z.ZodType<NumberUpdate> => {
-      return z.object({ value });
+      return z.object({ set: value });
     },
     prisma: (value: NumberUpdate) => {
       return {
-        set: value.value,
+        set: value.set,
       };
     },
   },

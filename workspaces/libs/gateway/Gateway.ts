@@ -15,8 +15,8 @@ export class Gateway {
   }
 
   async command<T extends ServiceCommandConfig['command']>(config: IGatewayRequest<T>) {
-    const result = await a
-      .post<IGatewayResponse<T>>(`${this.endpoint}/command`, config, {
+    const result: IGatewayResponse<T> = await a
+      .post(`${this.endpoint}/command`, config, {
         withCredentials: true,
       })
       .then(res => res.data)
@@ -25,17 +25,24 @@ export class Gateway {
 
         // The microservice responded with an error
         if (axiosErr.response) {
-          return axiosErr.response.data as IGatewayResponse<T>;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return axiosErr.response.data as any;
         }
 
         // The request was made but no response received
         else if (axiosErr.request) {
-          return new MicroserviceTimeoutException();
+          const exception = new MicroserviceTimeoutException();
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return exception as any;
         }
 
         // Something happened in setting up the request
         else {
-          return new GatewayException();
+          const exception = new GatewayException();
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return exception as any;
         }
       });
 

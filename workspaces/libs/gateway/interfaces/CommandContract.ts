@@ -13,12 +13,14 @@ type ConfigArg = {
     data: unknown;
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  exceptions: IException<any, any>;
+  exceptions: IException<any, any> | null;
 };
 
 export type ICommandContract<TArg extends ConfigArg = ConfigArg> = Omit<
   TArg,
   'exceptions'
 > & {
-  exceptions: TArg['exceptions'] | CommonExceptions;
+  exceptions: TArg['exceptions'] extends null
+    ? CommonExceptions
+    : TArg['exceptions'] | CommonExceptions;
 };

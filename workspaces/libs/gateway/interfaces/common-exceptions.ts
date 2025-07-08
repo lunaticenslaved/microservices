@@ -6,7 +6,8 @@ export type CommonExceptions =
   | UnknownException
   | UnknownException
   | MicroserviceTimeoutException
-  | NonGatewayAccessException;
+  | NonGatewayAccessException
+  | GatewayException;
 
 export class RequestValidationException extends Exception<
   'common/validation-error',
