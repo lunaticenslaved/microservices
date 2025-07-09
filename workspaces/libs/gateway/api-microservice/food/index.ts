@@ -3,6 +3,8 @@ import { ServiceContract } from '../../interfaces/ServiceContract';
 import * as FoodProduct from './product';
 import * as FoodMeal from './meal';
 
+export { FoodProduct, FoodMeal };
+
 export type FoodCommandConfig =
   // Product
   | FoodProduct.CreateCommand
@@ -23,5 +25,3 @@ export const FoodContract = new ServiceContract<FoodCommandConfig>({
   // Meal
   'food/meal/create': { request: { enrichments: { user: true } } },
 });
-
-export { FoodProduct };

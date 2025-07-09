@@ -14,7 +14,10 @@ export default new MessageParser({
         command: 'food/product/find-many',
         data: {
           where: {
-            name: { in: [groups.name], mode: 'case-insensitive' },
+            name: {
+              in: [groups.name],
+              mode: 'insensitive',
+            },
           },
         },
       });

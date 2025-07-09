@@ -2,32 +2,7 @@ import { Result } from '@libs/common';
 import { FoodProduct } from '@libs/gateway';
 
 import { PrismaTransaction } from '#/db';
-
-type ListFilter = {
-  where?: {
-    id?: { in: string[] };
-    name?: {
-      startsWith?: string;
-      mode?: 'case-sensitive' | 'case-insensitive';
-      in?: string[];
-    };
-  };
-};
-
-function listFilter(arg: ListFilter) {
-  return {
-    id: arg.where?.id,
-    name: arg.where?.name
-      ? {
-          ...arg.where.name,
-          mode:
-            arg.where.name.mode === 'case-insensitive'
-              ? ('insensitive' as const)
-              : ('default' as const),
-        }
-      : undefined,
-  };
-}
+import { Prisma } from '../db/generated';
 
 const DTO_SELECT = {
   id: true,
@@ -63,22 +38,25 @@ async function checkIfNameUnique(arg: { name: string }, context: CallContext) {
 }
 
 export async function findMany_DTO(
-  arg: ListFilter,
+  arg: { where?: Prisma.ProductWhereInput },
   context: CallContext,
 ): Promise<FoodProduct.DTO[]> {
   return await context.trx.product.findMany({
     select: DTO_SELECT,
     where: {
-      ...listFilter(arg),
+      ...arg.where,
       userId: context.user.id,
     },
   });
 }
 
-export async function findMany(arg: ListFilter, context: CallContext) {
+export async function findMany(
+  arg: { where?: Prisma.ProductWhereInput },
+  context: CallContext,
+) {
   return await context.trx.product.findMany({
     where: {
-      ...listFilter(arg),
+      ...arg.where,
       userId: context.user.id,
     },
     select: {
@@ -134,9 +112,15 @@ export async function update(arg: { id: string; name: string }, context: CallCon
   return Result.success(null);
 }
 
-export async function deleteMany(arg: ListFilter, context: CallContext) {
+export async function deleteMany(
+  arg: { where?: Prisma.ProductWhereInput },
+  context: CallContext,
+) {
   const { count } = await context.trx.product.deleteMany({
-    where: listFilter(arg),
+    where: {
+      ...arg.where,
+      userId: context.user.id,
+    },
   });
 
   return { count };

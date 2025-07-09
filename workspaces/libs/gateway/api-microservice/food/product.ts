@@ -2,6 +2,14 @@ import { FoodDomain } from '@libs/domain';
 import { NumberUpdate } from '@libs/common';
 
 import { Exception, ICommandContract } from '../../interfaces';
+import { EntityConfig, EntityFindManyInput } from '../../interfaces/entity-contracts';
+
+export const Config = new EntityConfig({
+  id: { type: 'uuid' },
+  name: { type: 'string' },
+});
+
+export type FindManyInput = EntityFindManyInput<typeof Config>;
 
 export class NameNotUniqueException extends Exception<
   'food/product/name-not-unique',
@@ -113,16 +121,7 @@ export type DeleteCommand = ICommandContract<{
 export type FindManyCommand = ICommandContract<{
   command: 'food/product/find-many';
   request: {
-    data: {
-      where?: {
-        id?: { in: string[] };
-        name?: {
-          startsWith?: string;
-          mode?: 'case-sensitive' | 'case-insensitive';
-          in?: string[];
-        };
-      };
-    };
+    data: FindManyInput;
     enrichments: {
       user: true;
     };
