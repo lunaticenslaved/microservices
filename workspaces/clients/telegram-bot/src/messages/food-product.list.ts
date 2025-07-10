@@ -1,5 +1,5 @@
-import { MessageParser } from '../MessageParser';
-import { gateway } from '../../gateway';
+import { MessageParser } from './MessageParser';
+import { gateway } from '../gateway';
 
 const pattern = /Список продуктов/;
 

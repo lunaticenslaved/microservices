@@ -1,7 +1,5 @@
 export { type IException, Exception } from './Exception';
 
-export { SuccessResponse } from './Response';
-
 export { type ICommandContract } from './CommandContract';
 export { type ICommandRequest } from './CommandRequest';
 export {

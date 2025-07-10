@@ -8,5 +8,9 @@ export class MessageParser {
   }) {
     this.isMatch = arg.isMatch;
     this.handle = arg.handle;
+
+    MESSAGES.push(this);
   }
 }
+
+export const MESSAGES: MessageParser[] = [];

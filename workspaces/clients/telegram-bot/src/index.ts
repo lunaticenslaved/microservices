@@ -11,6 +11,8 @@ app.use(express.text());
 app.post('/test-message', async (req, res) => {
   const message = req.body;
 
+  console.log(messages);
+
   for (const messageConfig of messages) {
     if (messageConfig.isMatch(message)) {
       const result = await messageConfig.handle(message);

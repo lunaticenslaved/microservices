@@ -1,55 +1,10 @@
-import { FoodDomain } from '@libs/domain';
 import { NumberUpdate } from '@libs/common';
 
-import { Exception, ICommandContract } from '../../interfaces';
-import { EntityConfig, EntityFindManyInput } from '../../interfaces/entity-contracts';
+import { ICommandContract } from '../../../interfaces';
 
-export const Config = new EntityConfig({
-  id: { type: 'uuid' },
-  name: { type: 'string' },
-});
-
-export type FindManyInput = EntityFindManyInput<typeof Config>;
-
-export class NameNotUniqueException extends Exception<
-  'food/product/name-not-unique',
-  null
-> {
-  constructor(arg: { name: string }) {
-    super({
-      type: 'food/product/name-not-unique',
-      status: 400,
-      message: `Product with name '${arg.name}' already exists`,
-      details: null,
-    });
-  }
-}
-
-export class NotFoundException extends Exception<'food/product/not-found', null> {
-  constructor(arg: { id: string } | { name: string }) {
-    super({
-      type: 'food/product/not-found',
-      status: 404,
-      message:
-        'id' in arg
-          ? `Product with id '${arg.id}' not found`
-          : `Product with name '${arg.name}' not found`,
-      details: null,
-    });
-  }
-}
-
-// ---------------------------------------------------------------------------------------
-// DTO'S ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-export type DTO = {
-  id: FoodDomain.Product['id'];
-  name: FoodDomain.Product['name'];
-  nutrients: Pick<
-    FoodDomain.Nutrients,
-    'calories' | 'carbs' | 'fats' | 'fibers' | 'proteins'
-  >;
-};
+import { NameNotUniqueException, NotFoundException } from './exceptions';
+import { ProductDTO } from './dtos';
+import { ProductFindManyInput } from './entity-config';
 
 // CREATE --------------------------------------------------------------------------------
 export type CreateCommand = ICommandContract<{
@@ -70,7 +25,7 @@ export type CreateCommand = ICommandContract<{
     };
   };
   response: {
-    data: DTO;
+    data: ProductDTO;
   };
   exceptions: NameNotUniqueException;
 }>;
@@ -95,7 +50,7 @@ export type UpdateCommand = ICommandContract<{
     };
   };
   response: {
-    data: DTO;
+    data: ProductDTO;
   };
   exceptions: NotFoundException | NameNotUniqueException;
 }>;
@@ -121,14 +76,14 @@ export type DeleteCommand = ICommandContract<{
 export type FindManyCommand = ICommandContract<{
   command: 'food/product/find-many';
   request: {
-    data: FindManyInput;
+    data: ProductFindManyInput;
     enrichments: {
       user: true;
     };
   };
   response: {
     data: {
-      items: DTO[];
+      items: ProductDTO[];
     };
   };
   exceptions: NotFoundException;

@@ -3,7 +3,7 @@ import { PrismaTransaction } from '#/db';
 import { FoodDomain } from '@libs/domain';
 import { ServiceUtils } from '@libs/service-utils';
 import { RequestValidationException } from '@libs/gateway';
-import { Result, ResultSuccess } from '@libs/common';
+import { Result } from '@libs/common';
 
 // CREATE NUTRIENTS ------------------------------------------------------------------------
 export type CreateRequest = z.infer<typeof CreateSchema>;
@@ -99,14 +99,10 @@ export async function update(
 }
 
 // DELETE MANY -----------------------------------------------------------------------------
-export type DeleteManyRequest = z.infer<typeof DeleteManySchema>;
-export const DeleteManySchema = z.object({
-  ids: z.array(FoodDomain.NutrientsSchema.shape.id),
-});
 export async function deleteMany(
-  arg: DeleteManyRequest,
+  arg: { ids: string[] },
   context: { trx: PrismaTransaction },
-): Promise<ResultSuccess<{ count: number }>> {
+) {
   const { count } = await context.trx.nutrients.deleteMany({
     where: {
       id: {
@@ -115,5 +111,5 @@ export async function deleteMany(
     },
   });
 
-  return Result.success({ count });
+  return { count };
 }

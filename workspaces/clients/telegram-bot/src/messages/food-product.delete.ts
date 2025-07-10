@@ -1,18 +1,15 @@
-import { gateway } from '../../gateway';
-import { MessageParser } from '../MessageParser';
+import { MessageParser } from './MessageParser';
+import { gateway } from '../gateway';
 
-const pattern = /Добавить (.+?), (\d+) г/;
+const pattern = /Удалить продукт (?<name>.+?)/;
 
 export default new MessageParser({
   isMatch: text => pattern.test(text),
   handle: async text => {
-    const match = text.match(pattern);
+    const productName = text.match(pattern)?.groups?.name;
 
-    if (match) {
-      const productName = match[1]; // "Chocolate Cake"
-      const grams = parseFloat(match[2]); // 500 (as a number)
-
-      const response = await gateway.command({
+    if (productName) {
+      const findManyResponse = await gateway.command({
         command: 'food/product/find-many',
         data: {
           where: {
@@ -24,39 +21,38 @@ export default new MessageParser({
         },
       });
 
-      if (!response.success) {
+      if (!findManyResponse.success) {
         return {
           success: false,
-          message: response.message,
+          message: findManyResponse.message,
         };
       }
 
-      if (response.data.items.length === 0) {
+      if (findManyResponse.data.items.length === 0) {
         return {
           success: false,
           message: 'No products found',
         };
-      } else if (response.data.items.length > 1) {
+      } else if (findManyResponse.data.items.length > 1) {
         return {
           success: false,
           message: 'More than 1 product found',
         };
       }
 
-      const [product] = response.data.items;
+      const [product] = findManyResponse.data.items;
 
-      const result = await gateway.command({
-        command: 'food/meal/create',
+      const deleteResponse = await gateway.command({
+        command: 'food/product/delete',
         data: {
-          productId: product.id,
-          grams,
+          id: product.id,
         },
       });
 
-      if (!result.success) {
+      if (!deleteResponse.success) {
         return {
           success: false,
-          message: result.message,
+          message: deleteResponse.message,
         };
       }
 

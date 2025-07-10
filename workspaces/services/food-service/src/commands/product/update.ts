@@ -2,7 +2,7 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { FoodProduct, SuccessResponse } from '@libs/gateway';
+import { FoodProduct } from '@libs/gateway';
 import { createNumberUpdateSchema } from '@libs/service-utils';
 import { NutrientsSchema, ProductSchema } from '@libs/domain/food';
 
@@ -58,10 +58,11 @@ App.addCommand({
         { trx, user },
       );
 
-      return new SuccessResponse({
+      return {
+        success: true,
         status: 200,
         data: updated,
-      });
+      };
     });
   },
 });

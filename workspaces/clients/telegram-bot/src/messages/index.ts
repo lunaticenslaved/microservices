@@ -1,5 +1,9 @@
-import foodMessages from './food';
+export { MESSAGES as default } from './MessageParser';
 
-const messages = [...foodMessages];
+import './food-meal.create';
+import './food-meal.delete';
+import './food-meal.list';
 
-export default messages;
+import './food-product.create';
+import './food-product.delete';
+import './food-product.list';

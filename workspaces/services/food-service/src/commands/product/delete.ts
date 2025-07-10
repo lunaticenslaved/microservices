@@ -2,7 +2,7 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import { Database } from '#/db';
 import { ProductSchema } from '@libs/domain/food';
-import { FoodProduct, SuccessResponse } from '@libs/gateway';
+import { FoodProduct } from '@libs/gateway';
 import z from 'zod/v4';
 
 export default App.addCommand({
@@ -38,10 +38,11 @@ export default App.addCommand({
 
       await Components.Nutrients.deleteMany({ ids: [found.nutrientsId] }, { trx });
 
-      return new SuccessResponse({
+      return {
+        success: true,
         status: 200,
         data: undefined,
-      });
+      };
     });
   },
 });

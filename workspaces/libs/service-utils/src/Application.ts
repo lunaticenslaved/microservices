@@ -11,7 +11,6 @@ import {
   UnknownCommandException,
   UnknownException,
   ICommandRequest,
-  SuccessResponse,
   ServiceCommandConfig,
   ExtractCommandContract,
   NonGatewayAccessException,
@@ -23,16 +22,19 @@ import { AppEnv, AppConfig } from './types';
 // const CORS_ORIGIN_WHITELIST: string[] = [];
 const GATEWAY_TOKEN_HEADER = 'x-gateway-token';
 
+interface IHandlerSuccessResponse<T extends ServiceCommandConfig['command']> {
+  success: true;
+  status: number;
+  data: ExtractCommandContract<T>['response']['data'];
+}
+
 type ApplicationCommandConfig<T extends ServiceCommandConfig['command'], TContext> = {
   command: T;
   validator: z.ZodType<ExtractCommandContract<T>['request']['data']>;
   handler: (
     request: ICommandRequest<ExtractCommandContract<T>>,
     context: TContext,
-  ) => Promise<
-    | SuccessResponse<ExtractCommandContract<T>['response']['data']>
-    | ExtractCommandContract<T>['exceptions']
-  >;
+  ) => Promise<IHandlerSuccessResponse<T> | ExtractCommandContract<T>['exceptions']>;
 };
 
 type ApplicationConstructor<TConfig> = {
@@ -69,7 +71,7 @@ export class Application<TConfig, TCommandContext> {
     return config;
   }
 
-  findCommandConfigOfThrow(command: string) {
+  private _findCommandConfigOrThrow(command: string) {
     const commandConfig = this.commands[command] as unknown as
       | ApplicationCommandConfig<ServiceCommandConfig['command'], TCommandContext>
       | undefined;
@@ -105,7 +107,7 @@ export class Application<TConfig, TCommandContext> {
       console.error(`[${serviceTitle}] Connecting to database... Error`, e);
     }
 
-    // FIXME what is it?
+    // TODO what is it?
     // app.use(fileUpload());
     // app.use(cookieParser());
     // app.use(
@@ -137,7 +139,7 @@ export class Application<TConfig, TCommandContext> {
         const requestContext = arg.createCommandContext({ app: this });
 
         console.log(`[${serviceTitle}] [COMMAND] Config found`);
-        const commandConfig = this.findCommandConfigOfThrow(req.body?.command);
+        const commandConfig = this._findCommandConfigOrThrow(req.body?.command);
 
         // Если Gateway пропустил сюда, то структура запроса уже валидна
         const commandRequest = req.body as ICommandRequest<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -154,7 +156,7 @@ export class Application<TConfig, TCommandContext> {
 
         res.status(response.status).json(response);
       } catch (error) {
-        console.error(`[${serviceTitle}] [COMMAND]`, error);
+        console.error(`[${serviceTitle}] [COMMAND]`, JSON.stringify(error, null, 2));
 
         if (error instanceof Exception) {
           res.status(error.status).json(error);
@@ -170,7 +172,7 @@ export class Application<TConfig, TCommandContext> {
       }
     });
 
-    // FIXME handle unknown route
+    // TODO handle unknown route
 
     const { port } = arg;
 

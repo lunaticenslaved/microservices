@@ -1,8 +1,8 @@
-import { MessageParser } from '../MessageParser';
-import { gateway } from '../../gateway';
+import dayjs from 'dayjs';
+import { gateway } from '../gateway';
+import { MessageParser } from './MessageParser';
 
-const pattern =
-  /Добавить (?<name>.+?)\. КБЖУКл (?<calories>\d+\.?\d*) (?<proteins>\d+\.?\d*) (?<fats>\d+\.?\d*) (?<carbs>\d+\.?\d*) (?<fibers>\d+\.?\d*)/;
+const pattern = /Добавить еду (?<date>.+?) (?<productName>.+?) (?<grams>\d+) г/;
 
 export default new MessageParser({
   isMatch: text => pattern.test(text),
@@ -10,12 +10,25 @@ export default new MessageParser({
     const groups = text.match(pattern)?.groups;
 
     if (groups) {
+      const date = groups.date;
+      const productName = groups.productName;
+      const grams = parseFloat(groups.grams);
+
+      let dateObj = dayjs();
+      if (date === 'сегодня') {
+        //
+      } else if (date === 'вчера') {
+        dateObj = dayjs().subtract(1, 'day');
+      } else {
+        dateObj = dayjs('DD.MM.YYYY');
+      }
+
       const response = await gateway.command({
         command: 'food/product/find-many',
         data: {
           where: {
             name: {
-              in: [groups.name],
+              in: [productName],
               mode: 'insensitive',
             },
           },
@@ -29,24 +42,26 @@ export default new MessageParser({
         };
       }
 
-      if (response.data.items.length > 1) {
+      if (response.data.items.length === 0) {
         return {
           success: false,
-          message: 'Product with the name already exists',
+          message: 'No products found',
+        };
+      } else if (response.data.items.length > 1) {
+        return {
+          success: false,
+          message: 'More than 1 product found',
         };
       }
 
+      const [product] = response.data.items;
+
       const result = await gateway.command({
-        command: 'food/product/create',
+        command: 'food/meal/create',
         data: {
-          name: groups.name,
-          nutrients: {
-            calories: parseFloat(groups.calories),
-            proteins: parseFloat(groups.proteins),
-            fats: parseFloat(groups.fats),
-            carbs: parseFloat(groups.carbs),
-            fibers: parseFloat(groups.fibers),
-          },
+          productId: product.id,
+          datetime: dateObj.toISOString(),
+          grams,
         },
       });
 

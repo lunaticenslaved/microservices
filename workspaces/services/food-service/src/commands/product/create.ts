@@ -2,7 +2,6 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { SuccessResponse } from '@libs/gateway';
 import { NutrientsSchema, ProductSchema } from '@libs/domain/food';
 
 export default App.addCommand({
@@ -54,10 +53,11 @@ export default App.addCommand({
         },
       );
 
-      return new SuccessResponse({
+      return {
+        success: true,
         status: 201,
         data: created,
-      });
+      };
     });
   },
 });

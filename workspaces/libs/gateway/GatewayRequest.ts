@@ -26,9 +26,3 @@ export interface IGatewayRequest<
   command: T;
   data: ExtractCommandContract<T>['request']['data'];
 }
-
-// export class Gateway {
-//   static request<T extends ServiceCommandConfig['command']>(arg: IGatewayRequest<T>) {
-//     return arg;
-//   }
-// }
