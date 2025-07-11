@@ -1,10 +1,10 @@
 import { App } from '#/app';
 import { Database } from '#/db';
-import { FoodMeal } from '@libs/gateway';
+import { FoodService } from '@libs/gateway';
 
 export default App.addCommand({
   command: 'food/meal/find-many',
-  validator: FoodMeal.EntityConfig.getFindManyValidator(),
+  validator: FoodService.MealEntityConfig.getFindManyValidator(),
   handler: async ({ data, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {
       const items = await trx.meal.findMany({

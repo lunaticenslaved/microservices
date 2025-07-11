@@ -1,7 +1,7 @@
 import { App } from '#/app';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { FoodMeal } from '@libs/gateway';
+import { FoodService } from '@libs/gateway';
 
 export default App.addCommand({
   command: 'food/meal/delete',
@@ -20,7 +20,7 @@ export default App.addCommand({
       });
 
       if (!foundMeal) {
-        return new FoodMeal.NotFoundException({ id: data.id });
+        return new FoodService.MealNotFoundException({ id: data.id });
       }
 
       await trx.meal.delete({

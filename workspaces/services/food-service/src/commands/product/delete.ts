@@ -2,7 +2,7 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import { Database } from '#/db';
 import { FoodDomain } from '@libs/domain';
-import { FoodProduct } from '@libs/gateway';
+import { FoodService } from '@libs/gateway';
 import z from 'zod/v4';
 
 export default App.addCommand({
@@ -23,7 +23,7 @@ export default App.addCommand({
       );
 
       if (!found) {
-        return new FoodProduct.NotFoundException({ id: data.id });
+        return new FoodService.ProductNotFoundException({ id: data.id });
       }
 
       await Components.Product.deleteMany(

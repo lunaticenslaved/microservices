@@ -2,7 +2,7 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { FoodProduct } from '@libs/gateway';
+import { FoodService } from '@libs/gateway';
 import { createNumberUpdateSchema } from '@libs/service-utils';
 import { FoodDomain } from '@libs/domain';
 
@@ -34,7 +34,7 @@ App.addCommand({
       );
 
       if (!product) {
-        return new FoodProduct.NotFoundException({ id: data.id });
+        return new FoodService.ProductNotFoundException({ id: data.id });
       }
 
       if (data.name) {

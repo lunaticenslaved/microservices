@@ -3,7 +3,7 @@ import { dayjs } from '../libs/dayjs';
 import { gateway } from '../gateway';
 import { MessageParser } from './MessageParser';
 import { FoodDomain } from '@libs/domain';
-import { FoodProduct } from '@libs/gateway';
+import { FoodService } from '@libs/gateway';
 
 const pattern = /^Список еды (?<date>.+?)$/;
 
@@ -106,7 +106,7 @@ export default new MessageParser({
 
 function sumNutrients(
   meals: FoodDomain.Meal[],
-  products: Pick<FoodProduct.DTO, 'id' | 'nutrients'>[],
+  products: Pick<FoodService.ProductDTO, 'id' | 'nutrients'>[],
 ) {
   const nutrients = meals.map(meal => {
     const product = products.find(p => p.id === meal.productId);

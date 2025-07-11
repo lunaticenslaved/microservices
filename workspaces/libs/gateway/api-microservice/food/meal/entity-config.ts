@@ -1,6 +1,6 @@
 import { EntityConfig, EntityFindManyInput } from './../../../interfaces-entity';
 
-export const MealConfig = new EntityConfig({
+export const MealEntityConfig = new EntityConfig({
   id: { type: 'uuid' },
   datetime: { type: 'datetime' },
   grams: { type: 'number' },
@@ -16,4 +16,4 @@ export const MealConfig = new EntityConfig({
   },
 });
 
-export type MealFindManyInput = EntityFindManyInput<typeof MealConfig>;
+export type MealFindManyInput = EntityFindManyInput<typeof MealEntityConfig>;

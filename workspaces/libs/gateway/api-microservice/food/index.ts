@@ -1,24 +1,31 @@
 import { ServiceContract } from '../../interfaces/ServiceContract';
 
-import * as FoodProduct from './product';
-import * as FoodMeal from './meal';
+// Product
+export * from './product/exceptions';
+export * from './product/dtos';
+export { ProductEntityConfig } from './product/entity-config';
+import * as ProductCommands from './product/commands';
 
-export { FoodProduct, FoodMeal };
+// Meal
+export * from './meal/exceptions';
+export * from './product/dtos';
+export { MealEntityConfig } from './meal/entity-config';
+import * as MealCommands from './meal/commands';
 
-export type FoodCommandConfig =
+export type CommandConfigs =
   // Product
-  | FoodProduct.CreateCommand
-  | FoodProduct.UpdateCommand
-  | FoodProduct.DeleteCommand
-  | FoodProduct.FindManyCommand
+  | ProductCommands.CreateCommand
+  | ProductCommands.UpdateCommand
+  | ProductCommands.DeleteCommand
+  | ProductCommands.FindManyCommand
 
   // Meal
-  | FoodMeal.CreateCommand
-  | FoodMeal.UpdateCommand
-  | FoodMeal.DeleteCommand
-  | FoodMeal.FindManyCommand;
+  | MealCommands.CreateCommand
+  | MealCommands.UpdateCommand
+  | MealCommands.DeleteCommand
+  | MealCommands.FindManyCommand;
 
-export const FoodContract = new ServiceContract<FoodCommandConfig>({
+export const Contract = new ServiceContract<CommandConfigs>({
   // Product
   'food/product/create': { request: { enrichments: { user: true } } },
   'food/product/update': { request: { enrichments: { user: true } } },

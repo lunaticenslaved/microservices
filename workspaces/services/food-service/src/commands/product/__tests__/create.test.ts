@@ -1,11 +1,11 @@
 import createCommand from '../create';
 import { createTestCommandContext } from '#/utils-test';
 import { Database } from '#/db';
-import { FoodProduct } from '@libs/gateway';
+import { ExtractCommandContract } from '@libs/gateway';
 import { UnwrapPromiseFnResult } from '@libs/common';
 import { randomUUID } from 'crypto';
 
-type CreateCommand = FoodProduct.CreateCommand;
+type CreateCommand = ExtractCommandContract<'food/product/create'>;
 
 describe('validator is valid', () => {
   test('name is trimmed', () => {

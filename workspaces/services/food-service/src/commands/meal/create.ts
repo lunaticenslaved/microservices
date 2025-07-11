@@ -1,7 +1,7 @@
 import { App } from '#/app';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { FoodMeal, FoodProduct } from '@libs/gateway';
+import { FoodService } from '@libs/gateway';
 
 export default App.addCommand({
   command: 'food/meal/create',
@@ -22,7 +22,7 @@ export default App.addCommand({
       });
 
       if (!product) {
-        return new FoodProduct.NotFoundException({ id: data.productId });
+        return new FoodService.ProductNotFoundException({ id: data.productId });
       }
 
       const existingMeal = await trx.meal.findFirst({
@@ -34,7 +34,7 @@ export default App.addCommand({
       });
 
       if (existingMeal) {
-        return new FoodMeal.ProductInDatetimeExistsException({
+        return new FoodService.MealProductInDatetimeExistsException({
           productId: data.productId,
         });
       }

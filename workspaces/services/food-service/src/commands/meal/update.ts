@@ -1,7 +1,7 @@
 import { App } from '#/app';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { FoodProduct } from '@libs/gateway';
+import { FoodService } from '@libs/gateway';
 
 export default App.addCommand({
   command: 'food/meal/update',
@@ -24,7 +24,7 @@ export default App.addCommand({
         });
 
         if (!product) {
-          return new FoodProduct.NotFoundException({ id: data.productId });
+          return new FoodService.ProductNotFoundException({ id: data.productId });
         }
       }
 

@@ -2,7 +2,7 @@ import { NumberUpdate } from '@libs/common';
 
 import { ICommandContract } from '../../../interfaces';
 
-import { NameNotUniqueException, NotFoundException } from './exceptions';
+import { ProductNameNotUniqueException, ProductNotFoundException } from './exceptions';
 import { ProductDTO } from './dtos';
 import { ProductFindManyInput } from './entity-config';
 
@@ -27,7 +27,7 @@ export type CreateCommand = ICommandContract<{
   response: {
     data: ProductDTO;
   };
-  exceptions: NameNotUniqueException;
+  exceptions: ProductNameNotUniqueException;
 }>;
 
 // UPDATE --------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ export type UpdateCommand = ICommandContract<{
   response: {
     data: ProductDTO;
   };
-  exceptions: NotFoundException | NameNotUniqueException;
+  exceptions: ProductNotFoundException | ProductNameNotUniqueException;
 }>;
 
 // DELETE --------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ export type DeleteCommand = ICommandContract<{
   response: {
     data: void;
   };
-  exceptions: NotFoundException;
+  exceptions: ProductNotFoundException;
 }>;
 
 // FIND MANY -----------------------------------------------------------------------------
@@ -86,5 +86,5 @@ export type FindManyCommand = ICommandContract<{
       items: ProductDTO[];
     };
   };
-  exceptions: NotFoundException;
+  exceptions: ProductNotFoundException;
 }>;

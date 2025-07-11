@@ -1,5 +1,5 @@
 import { Result } from '@libs/common';
-import { FoodProduct } from '@libs/gateway';
+import { FoodService } from '@libs/gateway';
 
 import { PrismaTransaction } from '#/db';
 import { Prisma } from '../db/generated';
@@ -40,7 +40,7 @@ async function checkIfNameUnique(arg: { name: string }, context: CallContext) {
 export async function findMany_DTO(
   arg: { where?: Prisma.ProductWhereInput },
   context: CallContext,
-): Promise<FoodProduct.DTO[]> {
+): Promise<FoodService.ProductDTO[]> {
   return await context.trx.product.findMany({
     select: DTO_SELECT,
     where: {
@@ -74,7 +74,9 @@ export async function create(
 ) {
   const isNameUnique = await checkIfNameUnique({ name: arg.name }, context);
   if (!isNameUnique) {
-    return Result.error(new FoodProduct.NameNotUniqueException({ name: arg.name }));
+    return Result.error(
+      new FoodService.ProductNameNotUniqueException({ name: arg.name }),
+    );
   }
 
   const result = await context.trx.product.create({
@@ -95,7 +97,7 @@ export async function update(arg: { id: string; name: string }, context: CallCon
   // Check if name is unique
   const name = arg.name;
   if (!(await checkIfNameUnique({ name }, context))) {
-    return Result.error(new FoodProduct.NameNotUniqueException({ name }));
+    return Result.error(new FoodService.ProductNameNotUniqueException({ name }));
   }
 
   // Update product

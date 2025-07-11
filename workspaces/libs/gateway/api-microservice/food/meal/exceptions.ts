@@ -1,6 +1,6 @@
 import { Exception } from '../../../interfaces';
 
-export class NotFoundException extends Exception<'food/meal/not-found', null> {
+export class MealNotFoundException extends Exception<'food/meal/not-found', null> {
   constructor(arg: { id: string }) {
     super({
       type: 'food/meal/not-found',
@@ -11,7 +11,7 @@ export class NotFoundException extends Exception<'food/meal/not-found', null> {
   }
 }
 
-export class ProductInDatetimeExistsException extends Exception<
+export class MealProductInDatetimeExistsException extends Exception<
   'food/meal/product-in-datetime-exists',
   null
 > {

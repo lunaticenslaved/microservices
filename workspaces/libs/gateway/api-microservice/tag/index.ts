@@ -4,7 +4,7 @@ import * as TagUniqueKey from './unique-key';
 
 export { TagUniqueKey };
 
-export const TagContract = new ServiceContract<TagCommandConfig>({
+export const Contract = new ServiceContract<CommandConfigs>({
   'tag/unique-key/create': {
     request: {
       enrichments: { user: true },
@@ -12,4 +12,4 @@ export const TagContract = new ServiceContract<TagCommandConfig>({
   },
 });
 
-export type TagCommandConfig = TagUniqueKey.CreateCommand;
+export type CommandConfigs = TagUniqueKey.CreateCommand;

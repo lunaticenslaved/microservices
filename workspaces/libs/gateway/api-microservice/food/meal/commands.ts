@@ -1,16 +1,12 @@
 import { ICommandContract } from '../../../interfaces';
 
-import * as Product from '../product';
-
+import { ProductNotFoundException } from '../product/exceptions';
 import { MealFindManyInput } from './entity-config';
-import * as MealExceptions from './exceptions';
-
-export type DTO = {
-  id: string;
-  datetime: string;
-  grams: number;
-  productId: string;
-};
+import {
+  MealNotFoundException,
+  MealProductInDatetimeExistsException,
+} from './exceptions';
+import { MealDTO } from './dtos';
 
 export type CreateCommand = ICommandContract<{
   command: 'food/meal/create';
@@ -25,9 +21,9 @@ export type CreateCommand = ICommandContract<{
     };
   };
   response: {
-    data: DTO;
+    data: MealDTO;
   };
-  exceptions: Product.NotFoundException | MealExceptions.ProductInDatetimeExistsException;
+  exceptions: ProductNotFoundException | MealProductInDatetimeExistsException;
 }>;
 
 export type UpdateCommand = ICommandContract<{
@@ -44,9 +40,9 @@ export type UpdateCommand = ICommandContract<{
     };
   };
   response: {
-    data: DTO;
+    data: MealDTO;
   };
-  exceptions: Product.NotFoundException;
+  exceptions: ProductNotFoundException;
 }>;
 
 export type DeleteCommand = ICommandContract<{
@@ -62,7 +58,7 @@ export type DeleteCommand = ICommandContract<{
   response: {
     data: null;
   };
-  exceptions: MealExceptions.NotFoundException;
+  exceptions: MealNotFoundException;
 }>;
 
 export type FindManyCommand = ICommandContract<{
@@ -75,7 +71,7 @@ export type FindManyCommand = ICommandContract<{
   };
   response: {
     data: {
-      items: DTO[];
+      items: MealDTO[];
     };
   };
   exceptions: null;

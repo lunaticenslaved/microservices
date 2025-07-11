@@ -1,6 +1,6 @@
 import { Exception } from '../../../interfaces';
 
-export class NameNotUniqueException extends Exception<
+export class ProductNameNotUniqueException extends Exception<
   'food/product/name-not-unique',
   null
 > {
@@ -14,7 +14,7 @@ export class NameNotUniqueException extends Exception<
   }
 }
 
-export class NotFoundException extends Exception<'food/product/not-found', null> {
+export class ProductNotFoundException extends Exception<'food/product/not-found', null> {
   constructor(arg: { id: string } | { name: string }) {
     super({
       type: 'food/product/not-found',
