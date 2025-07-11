@@ -1,14 +1,14 @@
 import { App } from '#/app';
 import { Components } from '#/components';
 import { Database } from '#/db';
-import { ProductSchema } from '@libs/domain/food';
+import { FoodDomain } from '@libs/domain';
 import { FoodProduct } from '@libs/gateway';
 import z from 'zod/v4';
 
 export default App.addCommand({
   command: 'food/product/delete',
   validator: z.object({
-    id: ProductSchema.shape.id,
+    id: FoodDomain.ProductSchema.shape.id,
   }),
   handler: async ({ data, enrichments: { user } }) => {
     return Database.prisma.$noThrowTransaction(async trx => {

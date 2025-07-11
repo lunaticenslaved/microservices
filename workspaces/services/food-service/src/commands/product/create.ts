@@ -2,7 +2,9 @@ import { App } from '#/app';
 import { Components } from '#/components';
 import z from 'zod/v4';
 import { Database } from '#/db';
-import { NutrientsSchema, ProductSchema } from '@libs/domain/food';
+import { FoodDomain } from '@libs/domain';
+
+const { ProductSchema, NutrientsSchema } = FoodDomain;
 
 export default App.addCommand({
   command: 'food/product/create',

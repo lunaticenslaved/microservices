@@ -9,8 +9,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@libs/common": "^1.0.0",
     "@types/validator": "^13.15.2",
+    "dayjs": "^1.11.13",
+    "lodash": "^4.17.21",
     "validator": "^13.15.15",
     "zod": "^3.25.56"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.20"
   }
 }

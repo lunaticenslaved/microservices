@@ -1,2 +1,2 @@
-export * as FoodDomain from './food';
-export * as TagDomain from './tag';
+export * as FoodDomain from './src/food';
+export * as TagDomain from './src/tag';

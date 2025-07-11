@@ -4,7 +4,9 @@ import z from 'zod/v4';
 import { Database } from '#/db';
 import { FoodProduct } from '@libs/gateway';
 import { createNumberUpdateSchema } from '@libs/service-utils';
-import { NutrientsSchema, ProductSchema } from '@libs/domain/food';
+import { FoodDomain } from '@libs/domain';
+
+const { ProductSchema, NutrientsSchema } = FoodDomain;
 
 App.addCommand({
   command: 'food/product/update',
